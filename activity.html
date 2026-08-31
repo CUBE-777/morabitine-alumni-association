@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">تفاصيل النشاط — جمعية خريجي ثانوية المرابطين</title>
+    <link rel="icon" href="logo.jpg" type="image/jpeg">
+    <meta name="description" content="تفاصيل أنشطة ومشاريع جمعية خريجي ثانوية المرابطين ببيوكرة.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --navy-deep: #081633;
+            --navy: #0f2657;
+            --navy-mid: #173a7d;
+            --gold: #f2a93b;
+            --gold-light: #ffd98a;
+            --cream: #f7f3ea;
+            --ink: #1a2238;
+            --white: #ffffff;
+            --muted: #5b6784;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            color: var(--ink);
+            background: var(--cream);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        .display {
+            font-family: 'Amiri', serif;
+            font-weight: 700;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 28px;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            z-index: 100;
+            padding: 16px 0;
+            background: rgba(8, 22, 51, .95);
+            backdrop-filter: blur(8px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .15);
+            transition: padding .35s ease;
+        }
+
+        header .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand img {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+        }
+
+        .brand-text {
+            color: var(--white);
+            font-family: 'Amiri', serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            line-height: 1.3;
+        }
+
+        .brand-text span {
+            display: block;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 400;
+            font-size: .72rem;
+            color: var(--gold-light);
+            letter-spacing: .05em;
+        }
+
+        nav ul {
+            display: flex;
+            gap: 34px;
+            list-style: none;
+        }
+
+        nav a {
+            color: var(--white);
+            font-size: .95rem;
+            font-weight: 500;
+            position: relative;
+            padding: 6px 0;
+        }
+
+        nav a::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--gold);
+            transition: width .3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: none;
+        }
+
+        /* ===== HERO BANNER ===== */
+        .activity-hero {
+            background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+            padding: 150px 0 60px;
+            color: var(--white);
+            position: relative;
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: .88rem;
+            color: var(--gold-light);
+            margin-bottom: 20px;
+        }
+
+        .breadcrumbs a {
+            color: #aab6d6;
+            transition: color .2s ease;
+        }
+
+        .breadcrumbs a:hover {
+            color: var(--gold);
+        }
+
+        .activity-hero h1 {
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1.3;
+            margin-bottom: 16px;
+            color: var(--white);
+        }
+
+        .activity-meta-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .meta-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, .1);
+            border: 1px solid rgba(255, 255, 255, .18);
+            padding: 6px 14px;
+            border-radius: 100px;
+            font-size: .88rem;
+            color: #c9d3ea;
+        }
+
+        /* ===== CONTENT LAYOUT ===== */
+        .activity-detail-section {
+            padding: 60px 0 100px;
+        }
+
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 2.2fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        .main-card {
+            background: var(--white);
+            border-radius: 18px;
+            border: 1px solid #e9e3d5;
+            padding: 36px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .03);
+        }
+
+        .featured-image-container {
+            width: 100%;
+            height: 380px;
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 28px;
+            background: #e9e3d5;
+        }
+
+        .featured-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .activity-body {
+            color: var(--ink);
+            font-size: 1.05rem;
+            line-height: 1.85;
+        }
+
+        .activity-body h3 {
+            font-size: 1.4rem;
+            color: var(--navy-deep);
+            margin: 28px 0 14px;
+        }
+
+        .activity-body p {
+            margin-bottom: 18px;
+            color: var(--muted);
+        }
+
+        .activity-body ul {
+            margin: 16px 0 24px 20px;
+            list-style: disc;
+            color: var(--muted);
+            padding-right: 20px;
+        }
+
+        .activity-body li {
+            margin-bottom: 8px;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar-card {
+            background: var(--white);
+            border-radius: 18px;
+            border: 1px solid #e9e3d5;
+            padding: 28px;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-card h3 {
+            font-size: 1.25rem;
+            color: var(--navy-deep);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--cream);
+        }
+
+        .info-list {
+            list-style: none;
+            margin-bottom: 24px;
+        }
+
+        .info-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(242, 169, 59, .15);
+            color: var(--navy-deep);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .info-text label {
+            display: block;
+            font-size: .8rem;
+            color: var(--muted);
+        }
+
+        .info-text span {
+            font-weight: 700;
+            color: var(--navy-deep);
+            font-size: .95rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 13px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .95rem;
+            transition: all .25s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-gold {
+            background: var(--gold);
+            color: var(--navy-deep);
+            box-shadow: 0 4px 14px rgba(242, 169, 59, .3);
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(242, 169, 59, .4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--navy-deep);
+            color: var(--navy-deep);
+            margin-top: 10px;
+        }
+
+        .btn-outline:hover {
+            background: var(--navy-deep);
+            color: var(--white);
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: var(--navy-deep);
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            padding: 36px 0;
+        }
+
+        footer .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .copyright {
+            color: #5b6784;
+            font-size: .82rem;
+            width: 100%;
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 860px) {
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-image-container {
+                height: 240px;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 78%;
+                max-width: 320px;
+                background: var(--navy-deep);
+                transform: translateX(100%);
+                transition: transform .35s ease;
+                padding: 100px 32px 32px;
+                z-index: 99;
+            }
+
+            nav.open {
+                transform: translateX(0);
+            }
+
+            nav ul {
+                flex-direction: column;
+                gap: 26px;
+            }
+
+            .nav-toggle {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+                background: none;
+                border: none;
+                cursor: pointer;
+                z-index: 101;
+                padding: 6px;
+            }
+
+            .nav-toggle span {
+                width: 24px;
+                height: 2px;
+                background: var(--white);
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <a href="index.html" class="brand">
+                <img src="logo.jpg" alt="شعار جمعية خريجي ثانوية المرابطين">
+                <div class="brand-text">جمعية خريجي ثانوية المرابطين<span>خريجون... لكن مهمتنا تستمر</span></div>
+            </a>
+            <button class="nav-toggle" id="navToggle" aria-label="فتح القائمة">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="mainNav">
+                <ul>
+                    <li><a href="index.html#home">الرئيسية</a></li>
+                    <li><a href="index.html#about">من نحن</a></li>
+                    <li><a href="index.html#activities">أنشطتنا</a></li>
+                    <li><a href="index.html#gallery">معرض الصور</a></li>
+                    <li><a href="index.html#join">انخرط معنا</a></li>
+                    <li><a href="index.html#contact">اتصل بنا</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO BANNER -->
+    <section class="activity-hero">
+        <div class="container">
+            <div class="breadcrumbs">
+                <a href="index.html">الرئيسية</a>
+                <span>‹</span>
+                <a href="index.html#activities">أنشطتنا</a>
+                <span>‹</span>
+                <span id="breadcrumbTitle" style="color:var(--gold);">تفاصيل النشاط</span>
+            </div>
+
+            <h1 id="activityTitle">جاري تحميل تفاصيل النشاط...</h1>
+
+            <div class="activity-meta-pills">
+                <div class="meta-pill">📅 <span id="activityDate">تاريخ النشاط</span></div>
+                <div class="meta-pill">📍 <span id="activityLocation">الموقع</span></div>
+                <div class="meta-pill">🏷️ <span id="activityCategory">الفئة</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN DETAILS -->
+    <section class="activity-detail-section">
+        <div class="container">
+            <div class="activity-grid">
+
+                <!-- MAIN CARD -->
+                <div class="main-card">
+                    <div class="featured-image-container" id="imageWrapper">
+                        <img id="activityImage" src="logo.jpg" alt="صورة النشاط">
+                    </div>
+
+                    <div class="activity-body" id="activityContent">
+                        <h3>عن هذا النشاط</h3>
+                        <p>يتم تحميل تفاصيل وهدف النشاط حالياً...</p>
+                    </div>
+                </div>
+
+                <!-- SIDEBAR -->
+                <div class="sidebar-card">
+                    <h3>معلومات إضافية</h3>
+
+                    <ul class="info-list">
+                        <li>
+                            <div class="info-icon">📆</div>
+                            <div class="info-text">
+                                <label>التاريخ والزمان</label>
+                                <span id="sideDate">--</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="info-icon">📍</div>
+                            <div class="info-text">
+                                <label>مكان التنفيذ</label>
+                                <span id="sideLocation">--</span>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="info-icon">👥</div>
+                            <div class="info-text">
+                                <label>المستفيدون</label>
+                                <span id="sideTarget">تلاميذ وخريجو الثانوية</span>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <a href="index.html#join" class="btn btn-gold">المشاركة أو الانخراط</a>
+                    <button class="btn btn-outline" onclick="shareActivity()">مشاركة النشاط 🔗</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div class="brand">
+                <img src="logo.jpg" alt="شعار الجمعية" style="width:38px;height:38px;border-radius:8px;">
+                <div class="brand-text" style="color:var(--white);">جمعية خريجي ثانوية المرابطين</div>
+            </div>
+            <div class="copyright">© 2026 جمعية خريجي ثانوية المرابطين. جميع الحقوق محفوظة.</div>
+        </div>
+    </footer>
+
+    <script>
+        // Responsive Navigation
+        const navToggle = document.getElementById('navToggle');
+        const mainNav = document.getElementById('mainNav');
+        if (navToggle) {
+            navToggle.addEventListener('click', () => mainNav.classList.toggle('open'));
+        }
+
+        // Default Activities Data (4 Activities)
+        const defaultActivities = {
+            "annual-meeting": {
+                title: "لقاء الخريجين السنوي",
+                category: "تواصل وتأطير",
+                date: "موعد سنوي ثابت",
+                location: "الثانوية التأهيلية المرابطين",
+                target: "جميع دفعات الخريجين",
+                image: "logo.jpg",
+                content: `
+          <h3>أهداف الملتقى السنوي</h3>
+          <p>يعتبر لقاء الخريجين السنوي المحطة الأساسية التي تجمع بين الأجيال المتعاقبة من خريجي ثانوية المرابطين. يهدف هذا اللقاء إلى تجديد أواصر الأخوة، وتبادل الخبرات المهنية والأكاديمية، إضافة إلى تقييم حصيلة أنشطة الجمعية ومناقشة مشاريع السنة القادمة.</p>
+          <h3>برنامج اللقاء</h3>
+          <ul>
+            <li>استقبال وتجميع المشاركين والتسجيل.</li>
+            <li>كلمة افتتاحية وعرض شريط توثيقي لأهم المحطات.</li>
+            <li>جلسات حوارية ونقل الخبرات للتلاميذ المقبلين على التخرج.</li>
+            <li>أنشطة ترفيهية وتكريمات خاصة.</li>
+          </ul>
+        `
+            },
+            "study-mentorship": {
+                title: "برنامج المواكبة الدراسية",
+                category: "دعم تعليمي",
+                date: "طيلة السنة الدراسية",
+                location: "قاعات التكوين / عن بُعد",
+                target: "تلاميذ السنة الثانية بكالوريا",
+                image: "logo.jpg",
+                content: `
+          <h3>رؤية البرنامج</h3>
+          <p>يهدف هذا البرنامج إلى تقديم الدعم والتوجيه المستمر لتلاميذ الثانوية المقبلين على الامتحانات الوطنية والمباريات، من خلال حصص مراجعة وورشات توجيهية يقدمها خريجون متخصصون في مختلف المجالات.</p>
+          <h3>محاور المواكبة</h3>
+          <ul>
+            <li>دعم في المواد العلمية والأدبية الأساسية.</li>
+            <li>ورشات التوجيه الأكاديمي والتعريف بالمدارس والمعاهد الكبرى.</li>
+            <li>منح نصائح منهجية للتعامل مع ضغط الامتحانات الوطنية.</li>
+          </ul>
+        `
+            },
+            "student-support": {
+                title: "دعم التلاميذ المحتاجين",
+                category: "عمل تضامني",
+                date: "مع بداية كل موسم دراسي",
+                location: "الثانوية التأهيلية المرابطين",
+                target: "التلاميذ المعوزين والمحتاجين",
+                image: "logo.jpg",
+                content: `
+          <h3>عن المبادرة التضامنية</h3>
+          <p>تسعى الجمعية من خلال هذه المبادرة إلى التخفيف من الأعباء المادية على العائلات المعوزة لضمان استمرار التلاميذ في تحصيلهم العلمي في أفضل الظروف.</p>
+          <h3>مجالات الدعم</h3>
+          <ul>
+            <li>توفير المحافظ واللوازم المدرسية والكتب.</li>
+            <li>تقديم مساعدات وتسهيلات في التجهيزات الدراسية.</li>
+            <li>تغطية بعض مصاريف الأنشطة الموازية والرحلات المدرسية.</li>
+          </ul>
+        `
+            },
+            "volunteer-initiatives": {
+                title: "مبادرات تطوعية",
+                category: "أنشطة بيئية واجتماعية",
+                date: "على مدار السنة",
+                location: "المؤسسة ومحيطها الجغرافي",
+                target: "المؤسسة والمجتمع المحلي",
+                image: "logo.jpg",
+                content: `
+          <h3>رسالة العمل التطوعي</h3>
+          <p>نعمل على ترسيخ قيم المواطنة والتطوع لدى الخريجين والتلاميذ، عبر تنظيم مبادرات ميدانية تهدف إلى تحسين فضاء الثانوية وخدمة محيطها.</p>
+          <h3>أبرز الأنشطة التطوعية</h3>
+          <ul>
+            <li>حملات تشجير وتنظيف وتزيين ساحة ومرافق الثانوية.</li>
+            <li>تنظيم أيام تحسيسية حول السلامة والبيئة والصحة.</li>
+            <li>مبادرات تضامنية في الحي والمجتمع المحلي.</li>
+          </ul>
+        `
+            }
+        };
+
+        function loadActivity() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const activityId = urlParams.get('id') || 'annual-meeting';
+
+            fetch('content/activities.json')
+                .then(res => res.ok ? res.json() : null)
+                .then(data => {
+                    let activity = null;
+                    if (data && data.items) {
+                        activity = data.items.find(item => item.id === activityId);
+                    }
+                    if (!activity) {
+                        activity = defaultActivities[activityId] || defaultActivities["annual-meeting"];
+                    }
+                    renderActivity(activity);
+                })
+                .catch(() => {
+                    renderActivity(defaultActivities[activityId] || defaultActivities["annual-meeting"]);
+                });
+        }
+
+        function renderActivity(item) {
+            document.getElementById('pageTitle').innerText = `${item.title} — جمعية خريجي ثانوية المرابطين`;
+            document.getElementById('breadcrumbTitle').innerText = item.title;
+            document.getElementById('activityTitle').innerText = item.title;
+            document.getElementById('activityDate').innerText = item.date || 'غير محدد';
+            document.getElementById('activityLocation').innerText = item.location || 'بيوكرة';
+            document.getElementById('activityCategory').innerText = item.category || 'نشاط جمعوي';
+
+            document.getElementById('sideDate').innerText = item.date || 'غير محدد';
+            document.getElementById('sideLocation').innerText = item.location || 'بيوكرة';
+            if (item.target) document.getElementById('sideTarget').innerText = item.target;
+
+            if (item.image) {
+                document.getElementById('activityImage').src = item.image;
+            }
+
+            if (item.content) {
+                document.getElementById('activityContent').innerHTML = item.content;
+            }
+            // عرض المشاريع الفرعية إن وجدت
+            if (item.sub_activities && item.sub_activities.length > 0) {
+                let subHTML = `<h3 style="margin-top:32px;">الأعمال والمشاريع المنجزة:</h3><div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:16px; margin-top:16px;">`;
+
+                item.sub_activities.forEach(sub => {
+                    subHTML += `
+      <div style="background:#f7f3ea; border:1px solid #e9e3d5; border-radius:12px; padding:18px;">
+        ${sub.image ? `<img src="${sub.image}" style="width:100%; height:140px; object-fit:cover; border-radius:8px; margin-bottom:12px;">` : ''}
+        <h4 style="color:#081633; margin-bottom:8px;">${sub.title}</h4>
+        <p style="font-size:0.9rem; color:#5b6784;">${sub.desc}</p>
+      </div>
+    `;
+                });
+
+                subHTML += `</div>`;
+                document.getElementById('activityContent').innerHTML += subHTML;
+            }
+        }
+
+        function shareActivity() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    url: window.location.href
+                });
+            } else {
+                navigator.clipboard.writeText(window.location.href);
+                alert('تم نسخ رابط الصفحة بنجاح!');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', loadActivity);
+    </script>
+</body>
+
+</html>

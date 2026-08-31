@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>جمعية خريجي ثانوية المرابطين</title>
   <link rel="icon" href="logo.jpg" type="image/jpeg">
-  <meta name="description" content="جمعية خريجي ثانوية المرابطين ببيوكرة، اشتوكة آيت باها — جمعية تجمع خريجي الثانوية لدعم التلاميذ الحاليين وخدمة المدرسة والمجتمع المحلي.">
+  <meta name="description"
+    content="جمعية خريجي ثانوية المرابطين ببيوكرة، اشتوكة آيت باها — جمعية تجمع خريجي الثانوية لدعم التلاميذ الحاليين وخدمة المدرسة والمجتمع المحلي.">
   <meta property="og:title" content="جمعية خريجي ثانوية المرابطين">
   <meta property="og:description" content="معاً نبني جسرًا بين الأجيال، من مقاعد الدراسة إلى ميدان العطاء.">
   <meta property="og:image" content="logo.jpg">
@@ -949,21 +950,25 @@
           <div class="activity-icon">🤝</div>
           <h3>لقاء الخريجين السنوي</h3>
           <p>لقاء دوري يجمع خريجي مختلف الدفعات لتجديد الصلة وتبادل الأخبار والتجارب.</p>
+          <a href="activity.html?id=annual-meeting" class="btn btn-ghost">عرض التفاصيل ←</a>
         </div>
         <div class="activity-card">
           <div class="activity-icon">📚</div>
           <h3>برنامج المواكبة الدراسية</h3>
           <p>مبادرة لدعم التلاميذ الحاليين عبر حصص توجيه ومساعدة في المواد الأساسية.</p>
+          <a href="activity.html?id=study-mentorship" class="btn btn-ghost">عرض التفاصيل ←</a>
         </div>
         <div class="activity-card">
           <div class="activity-icon">🎒</div>
           <h3>دعم التلاميذ المحتاجين</h3>
           <p>مساهمات وتبرعات عينية لتوفير الأدوات واللوازم المدرسية عند الحاجة.</p>
+          <a href="activity.html?id=student-support" class="btn btn-ghost">عرض التفاصيل ←</a>
         </div>
         <div class="activity-card">
           <div class="activity-icon">🌱</div>
           <h3>مبادرات تطوعية</h3>
           <p>حملات تحسيسية وتطوعية داخل المؤسسة وفي الحي، بمشاركة الخريجين والتلاميذ.</p>
+          <a href="activity.html?id=volunteer-initiatives" class="btn btn-ghost">عرض التفاصيل ←</a>
         </div>
       </div>
     </div>
@@ -1000,7 +1005,8 @@
             <li>فرصة للمساهمة في التوجيه والتخطيط</li>
           </ul>
           <form id="membershipForm" name="membership" method="POST" data-netlify="true"
-            netlify-honeypot="bot-field-membership" action="/thank-you.html" style="background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12);">
+            netlify-honeypot="bot-field-membership" action="/thank-you.html"
+            style="background:rgba(255,255,255,.05); border-color:rgba(255,255,255,.12);">
             <input type="hidden" name="form-name" value="membership">
             <p style="display:none;"><label>لا تعبئ هذا الحقل: <input name="bot-field-membership"></label></p>
             <div class="form-row">
@@ -1042,7 +1048,9 @@
             <li>تمويل برامج المواكبة الدراسية</li>
             <li>المساهمة في الأنشطة والفعاليات</li>
           </ul>
-          <a href="https://wa.me/212679672284?text=السلام%20عليكم%2C%20أرغب%20في%20التبرع%20لدعم%20مشاريع%20الجمعية" target="_blank" rel="noopener" class="btn btn-ghost" style="color:var(--navy-deep); border-color:var(--navy-deep);">تواصل
+          <a href="https://wa.me/212679672284?text=السلام%20عليكم%2C%20أرغب%20في%20التبرع%20لدعم%20مشاريع%20الجمعية"
+            target="_blank" rel="noopener" class="btn btn-ghost"
+            style="color:var(--navy-deep); border-color:var(--navy-deep);">تواصل
             للتبرع</a>
         </div>
       </div>
@@ -1058,7 +1066,8 @@
           <ul class="contact-info">
             <li><span class="ico">✉</span>
               <div>
-                <h4>البريد الإلكتروني</h4><span><a href="mailto:a.laureats.almourabitine@gmail.com" style="color:#aab6d6;">a.laureats.almourabitine@gmail.com</a></span>
+                <h4>البريد الإلكتروني</h4><span><a href="mailto:a.laureats.almourabitine@gmail.com"
+                    style="color:#aab6d6;">a.laureats.almourabitine@gmail.com</a></span>
               </div>
             </li>
             <li><span class="ico">☎</span>
@@ -1128,7 +1137,7 @@
 
     // ===== Load gallery images from content/gallery.json (managed via /admin CMS) =====
     fetch('content/gallery.json')
-      .then(res => res.ok ? res.json() : { items: [] })
+      .then(res => res.ok ? res.json() : {items: []})
       .then(data => {
         const grid = document.getElementById('galleryGrid');
         const items = (data && data.items) ? data.items : [];
@@ -1140,7 +1149,7 @@
           </figure>
         `).join('');
       })
-      .catch(() => { /* keep placeholder on error */ });
+      .catch(() => { /* keep placeholder on error */});
   </script>
 
   <!-- Netlify Identity: needed so invite/confirmation email links redirect properly to the admin panel -->

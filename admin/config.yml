@@ -20,3 +20,37 @@ collections:
             fields:
               - { label: "الصورة", name: "image", widget: "image" }
               - { label: "الوصف (اختياري)", name: "caption", widget: "string", required: false }
+
+  - name: "activities"
+    label: "إدارة الأنشطة"
+    files:
+      - file: "content/activities.json"
+        label: "أنشطة الجمعية"
+        name: "activities"
+        fields:
+          - label: "الأنشطة"
+            name: "items"
+            widget: "list"
+            label_singular: "نشاط"
+            fields:
+              - { label: "معرف النشاط (ID لاتيني بدون مسافات)", name: "id", widget: "string" }
+              - { label: "عنوان النشاط", name: "title", widget: "string" }
+              - { label: "التصنيف", name: "category", widget: "string" }
+              - { label: "التاريخ", name: "date", widget: "string" }
+              - { label: "المكان", name: "location", widget: "string" }
+              - { label: "المستفيدون", name: "target", widget: "string" }
+              - { label: "صورة النشاط", name: "image", widget: "image" }
+              - { label: "تفاصيل النشاط (نص أو HTML)", name: "content", widget: "text" }
+
+              
+              # قسم المشاريع الفرعية لرئيس الجمعية
+              - label: "المشاريع/الأعمال الفرعية"
+                name: "sub_activities"
+                widget: "list"
+                required: false
+                label_singular: "مشروع فرعي"
+                fields:
+                  - { label: "عنوان العمل (مثال: حملة نظافة)", name: "title", widget: "string" }
+                  - { label: "تفاصيل العمل", name: "desc", widget: "text" }
+                  - { label: "صورة خاصة به (اختياري)", name: "image", widget: "image", required: false }
+
