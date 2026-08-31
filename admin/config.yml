@@ -1,0 +1,22 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "uploads/gallery"
+public_folder: "/uploads/gallery"
+
+collections:
+  - name: "gallery"
+    label: "معرض الصور"
+    files:
+      - file: "content/gallery.json"
+        label: "صور المعرض"
+        name: "gallery"
+        fields:
+          - label: "الصور"
+            name: "items"
+            widget: "list"
+            label_singular: "صورة"
+            fields:
+              - { label: "الصورة", name: "image", widget: "image" }
+              - { label: "الوصف (اختياري)", name: "caption", widget: "string", required: false }
