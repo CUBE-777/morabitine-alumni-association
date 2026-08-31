@@ -858,6 +858,117 @@
       }
     }
   </style>
+  <!-- Lightbox Custom Styles -->
+  <style>
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(8, 22, 51, 0.94);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 80vh;
+      border-radius: 12px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+      object-fit: contain;
+      border: 2px solid rgba(242, 169, 59, 0.3);
+    }
+
+    .lightbox-caption {
+      position: absolute;
+      bottom: 24px;
+      color: #ffffff;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 0.95rem;
+      background: rgba(0, 0, 0, 0.65);
+      padding: 8px 20px;
+      border-radius: 20px;
+      text-align: center;
+      max-width: 80%;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      color: var(--gold, #f2a93b);
+      font-size: 2.4rem;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 1;
+      transition: transform 0.2s;
+      z-index: 10001;
+    }
+
+    .lightbox-close:hover {
+      transform: scale(1.15);
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 1.4rem;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      z-index: 10001;
+    }
+
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+      background: var(--gold, #f2a93b);
+      color: var(--navy-deep, #081633);
+    }
+
+    .lightbox-prev {
+      right: 24px;
+    }
+
+    .lightbox-next {
+      left: 24px;
+    }
+
+    /* جعل صور المعرض قابلة للنقر */
+    #gallery img,
+    .gallery-card img,
+    .gallery-grid img {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    #gallery img:hover,
+    .gallery-card img:hover,
+    .gallery-grid img:hover {
+      transform: scale(1.02);
+    }
+  </style>
 </head>
 
 <body>
@@ -1164,6 +1275,78 @@
         }
       });
     }
+  </script>
+  <!-- Lightbox Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. إنشاء عناصر النافذة المكبرة ديناميكياً
+      const lightbox = document.createElement('div');
+      lightbox.className = 'lightbox-modal';
+      lightbox.id = 'lightboxModal';
+      lightbox.innerHTML = `
+      <button class="lightbox-close" id="lightboxClose" aria-label="إغلاق">&times;</button>
+      <button class="lightbox-prev" id="lightboxPrev" aria-label="الصورة السابقة">❯</button>
+      <img class="lightbox-content" id="lightboxImage" src="" alt="معاينة الصورة">
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+      <button class="lightbox-next" id="lightboxNext" aria-label="الصورة التالية">❮</button>
+    `;
+      document.body.appendChild(lightbox);
+
+      let currentImages = [];
+      let currentIndex = 0;
+
+      const modal = document.getElementById('lightboxModal');
+      const modalImg = document.getElementById('lightboxImage');
+      const modalCaption = document.getElementById('lightboxCaption');
+
+      function showImage(index) {
+        if (index < 0) index = currentImages.length - 1;
+        if (index >= currentImages.length) index = 0;
+        currentIndex = index;
+
+        const imgEl = currentImages[currentIndex];
+        modalImg.src = imgEl.src;
+
+        const captionText = imgEl.alt || imgEl.getAttribute('data-caption') || '';
+        if (captionText && captionText !== 'صورة المعرض') {
+          modalCaption.textContent = captionText;
+          modalCaption.style.display = 'block';
+        } else {
+          modalCaption.style.display = 'none';
+        }
+      }
+
+      // 2. الاستماع للنقر على أي صورة داخل قسم المعرض
+      document.addEventListener('click', (e) => {
+        const img = e.target.closest('#gallery img, .gallery-card img, .gallery-grid img');
+        if (img) {
+          currentImages = Array.from(document.querySelectorAll('#gallery img, .gallery-card img, .gallery-grid img'));
+          currentIndex = currentImages.indexOf(img);
+          if (currentIndex !== -1) {
+            showImage(currentIndex);
+            modal.classList.add('active');
+          }
+        }
+      });
+
+      // 3. التحكم بالأزرار والإغلاق
+      document.getElementById('lightboxClose').addEventListener('click', () => modal.classList.remove('active'));
+      document.getElementById('lightboxPrev').addEventListener('click', () => showImage(currentIndex - 1));
+      document.getElementById('lightboxNext').addEventListener('click', () => showImage(currentIndex + 1));
+
+      // الإغلاق عند النقر على الخلفية
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+      });
+
+      // التحكم بالكيبورد (Esc للإغلاق، الأسهم للتنقل)
+      document.addEventListener('keydown', (e) => {
+        if (!modal.classList.contains('active')) return;
+        if (e.key === 'Escape') modal.classList.remove('active');
+        if (e.key === 'ArrowRight') showImage(currentIndex - 1);
+        if (e.key === 'ArrowLeft') showImage(currentIndex + 1);
+      });
+    });
   </script>
 
 </body>
