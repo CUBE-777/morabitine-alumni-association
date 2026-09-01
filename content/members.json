@@ -1,4 +1,14 @@
 {
   "board": [],
-  "members": []
+  "members": [
+    {
+      "role": "عضو",
+      "name": "عبد النور",
+      "age": "20",
+      "promo": "2024",
+      "track": "علوم فيزيائية",
+      "profession": "علوم الحاسوب",
+      "image": "/uploads/members/whatsapp-image-2026-09-01-at-03.58.19.jpeg"
+    }
+  ]
 }
