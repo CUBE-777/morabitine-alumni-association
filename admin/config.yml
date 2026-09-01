@@ -54,3 +54,41 @@ collections:
                   - { label: "تفاصيل العمل", name: "desc", widget: "text" }
                   - { label: "صورة خاصة به (اختياري)", name: "image", widget: "image", required: false }
 
+  - name: "members"
+    label: "الأعضاء والمكتب المسير"
+    media_folder: "uploads/members"
+    public_folder: "/uploads/members"
+    files:
+      - file: "content/members.json"
+        label: "أعضاء الجمعية"
+        name: "members_file"
+        fields:
+          - label: "المكتب المسير الحالي"
+            name: "board"
+            widget: "list"
+            label_singular: "عضو مكتب"
+            summary: "{{role}} — {{name}}"
+            hint: "كل عنصر هنا يظهر كبطاقة عمودية في الموقع. الترتيب هنا هو ترتيب الظهور."
+            fields:
+              - { label: "الصورة", name: "image", widget: "image", required: false }
+              - { label: "الاسم الكامل", name: "name", widget: "string" }
+              - { label: "الصفة بجانب الاسم", name: "role", widget: "string", hint: "مثال: الرئيس، الكاتب العام، أمين المال" }
+              - { label: "العمر", name: "age", widget: "string", required: false }
+              - { label: "سنة التخرج", name: "promo", widget: "string", required: false }
+              - { label: "شعبة الباكالوريا", name: "track", widget: "string", required: false }
+              - { label: "التخصص الحالي أو المهنة", name: "profession", widget: "string", required: false }
+          - label: "الأعضاء"
+            name: "members"
+            widget: "list"
+            label_singular: "عضو"
+            summary: "{{role}} — {{name}}"
+            hint: "نفس شكل البطاقة. الصفة الافتراضية «عضو»، ويمكن تغييرها (عضو شرفي مثلاً)."
+            fields:
+              - { label: "الصورة", name: "image", widget: "image", required: false }
+              - { label: "الاسم الكامل", name: "name", widget: "string" }
+              - { label: "الصفة بجانب الاسم", name: "role", widget: "string", default: "عضو", hint: "تظهر شارة ذهبية بجانب الاسم. اتركها «عضو» أو غيّرها." }
+              - { label: "العمر", name: "age", widget: "string", required: false }
+              - { label: "سنة التخرج", name: "promo", widget: "string", required: false }
+              - { label: "شعبة الباكالوريا", name: "track", widget: "string", required: false }
+              - { label: "التخصص الحالي أو المهنة", name: "profession", widget: "string", required: false }
+

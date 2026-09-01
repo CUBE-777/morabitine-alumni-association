@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الأعضاء — جمعية خريجي ثانوية المرابطين</title>
+  <link rel="icon" href="logo.jpg" type="image/jpeg">
+  <meta name="description" content="تعرف على أعضاء جمعية خريجي ثانوية المرابطين ببيوكرة.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@300;400;500;700;900&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/people.css">
+  <style>
+    :root {
+      --navy-deep: #081633;
+      --navy: #0f2657;
+      --navy-mid: #173a7d;
+      --gold: #f2a93b;
+      --gold-light: #ffd98a;
+      --cream: #f7f3ea;
+      --ink: #1a2238;
+      --white: #ffffff;
+      --muted: #5b6784;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      color: var(--ink);
+      background: var(--cream);
+      line-height: 1.7;
+    }
+    h1, h2, h3 { font-family: 'Amiri', serif; font-weight: 700; }
+    a { text-decoration: none; color: inherit; }
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 28px; }
+    header {
+      position: fixed; top: 0; right: 0; left: 0; z-index: 100;
+      padding: 16px 0; background: rgba(8, 22, 51, .95);
+      backdrop-filter: blur(8px); box-shadow: 0 6px 24px rgba(0, 0, 0, .15);
+    }
+    header .container { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand img { width: 46px; height: 46px; border-radius: 10px; }
+    .brand-text { color: var(--white); font-family: 'Amiri', serif; font-weight: 700; font-size: 1.05rem; line-height: 1.3; }
+    .brand-text span { display: block; font-family: 'Tajawal', sans-serif; font-weight: 400; font-size: .72rem; color: var(--gold-light); }
+    nav ul { display: flex; gap: 34px; list-style: none; }
+    nav a { color: var(--white); font-size: .95rem; font-weight: 500; position: relative; padding: 6px 0; }
+    nav a::after {
+      content: ""; position: absolute; bottom: 0; right: 0; width: 0; height: 2px;
+      background: var(--gold); transition: width .3s ease;
+    }
+    nav a:hover::after { width: 100%; }
+    .nav-toggle { display: none; }
+    .page-hero {
+      background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+      padding: 150px 0 60px; color: var(--white);
+    }
+    .breadcrumbs { display: flex; align-items: center; gap: 10px; font-size: .88rem; color: var(--gold-light); margin-bottom: 20px; }
+    .breadcrumbs a { color: #aab6d6; }
+    .breadcrumbs a:hover { color: var(--gold); }
+    .page-hero h1 { font-size: clamp(2rem, 4vw, 3rem); line-height: 1.3; margin-bottom: 12px; }
+    .page-hero p { color: #c9d3ea; max-width: 640px; font-size: 1.05rem; }
+    .people-page { padding: 60px 0 100px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 13px 24px; border-radius: 8px; font-weight: 700;
+      border: 1px solid var(--navy-deep); color: var(--navy-deep);
+      transition: all .25s ease;
+    }
+    .btn:hover { background: var(--navy-deep); color: var(--white); }
+    footer {
+      background: var(--navy-deep); border-top: 1px solid rgba(255, 255, 255, .08); padding: 36px 0;
+    }
+    footer .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .copyright { color: #5b6784; font-size: .82rem; width: 100%; text-align: center; margin-top: 24px; }
+    @media (max-width: 860px) {
+      nav {
+        position: fixed; top: 0; right: 0; bottom: 0; width: 78%; max-width: 320px;
+        background: var(--navy-deep); transform: translateX(100%); transition: transform .35s ease;
+        padding: 100px 32px 32px; z-index: 99;
+      }
+      nav.open { transform: translateX(0); }
+      nav ul { flex-direction: column; gap: 26px; }
+      .nav-toggle {
+        display: flex; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; z-index: 101; padding: 6px;
+      }
+      .nav-toggle span { width: 24px; height: 2px; background: var(--white); display: block; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <a href="index.html" class="brand">
+        <img src="logo.jpg" alt="شعار جمعية خريجي ثانوية المرابطين">
+        <div class="brand-text">جمعية خريجي ثانوية المرابطين<span>خريجون... لكن مهمتنا تستمر</span></div>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="فتح القائمة"><span></span><span></span><span></span></button>
+      <nav id="mainNav">
+        <ul>
+          <li><a href="index.html#home">الرئيسية</a></li>
+          <li><a href="index.html#about">من نحن</a></li>
+          <li><a href="index.html#activities">أنشطتنا</a></li>
+          <li><a href="index.html#members">الأعضاء</a></li>
+          <li><a href="index.html#gallery">معرض الصور</a></li>
+          <li><a href="index.html#join">انخرط معنا</a></li>
+          <li><a href="index.html#contact">اتصل بنا</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumbs">
+        <a href="index.html">الرئيسية</a>
+        <span>‹</span>
+        <a href="index.html#members">الأعضاء</a>
+        <span>‹</span>
+        <span style="color:var(--gold);">قائمة الأعضاء</span>
+      </div>
+      <h1>الأعضاء</h1>
+      <p>خريجو ثانوية المرابطين المنخرطون في الجمعية، مع نبذة عن مسار كل واحد منهم.</p>
+    </div>
+  </section>
+
+  <section class="people-page">
+    <div class="container">
+      <div class="members-grid" id="peopleGrid">
+        <div class="gallery-empty">جاري تحميل قائمة الأعضاء...</div>
+      </div>
+      <div class="people-switch">
+        <a href="board.html" class="btn">عرض المكتب المسير الحالي</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="brand">
+        <img src="logo.jpg" alt="شعار الجمعية" style="width:38px;height:38px;border-radius:8px;">
+        <div class="brand-text" style="color:var(--white);">جمعية خريجي ثانوية المرابطين</div>
+      </div>
+      <div class="copyright">© 2026 جمعية خريجي ثانوية المرابطين. جميع الحقوق محفوظة.</div>
+    </div>
+  </footer>
+
+  <script src="js/members.js"></script>
+  <script>
+    document.getElementById('navToggle').addEventListener('click', () => {
+      document.getElementById('mainNav').classList.toggle('open');
+    });
+    loadMembersPage({
+      listKey: 'members',
+      gridId: 'peopleGrid',
+      fallbackBadge: 'عضو',
+      emptyText: 'سيتم إضافة الأعضاء من لوحة الإدارة قريباً.'
+    });
+  </script>
+</body>
+
+</html>
