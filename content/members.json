@@ -10,6 +10,16 @@
       "promo": "2024",
       "track": "PC",
       "profession": "SIE"
+    },
+    {
+      "role": "عضو",
+      "image": "/uploads/members/logo.jpg",
+      "name": "ahmad",
+      "university": "ENSA",
+      "age": "20",
+      "promo": "2024",
+      "track": "SM",
+      "profession": "IA"
     }
   ]
 }
