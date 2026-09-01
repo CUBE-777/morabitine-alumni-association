@@ -1,4 +1,15 @@
 {
   "board": [],
-  "members": []
+  "members": [
+    {
+      "role": "عضو",
+      "image": "/uploads/members/logo.jpg",
+      "name": "abdennour",
+      "university": "FSA",
+      "age": "20",
+      "promo": "2024",
+      "track": "PC",
+      "profession": "SIE"
+    }
+  ]
 }
