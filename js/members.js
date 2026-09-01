@@ -9,6 +9,7 @@ function escapeHtml(value) {
 function memberCardHtml(person, fallbackBadge) {
   const name = escapeHtml(person.name || 'عضو الجمعية');
   const badge = escapeHtml(person.role || fallbackBadge);
+  const university = escapeHtml(person.university || '').trim();
   const image = person.image ? escapeHtml(person.image) : 'logo.jpg';
   const facts = [
     ['العمر', person.age],
@@ -23,14 +24,19 @@ function memberCardHtml(person, fallbackBadge) {
     : '';
   return `
     <article class="member-card">
-      <img class="member-photo" src="${image}" alt="صورة ${name}" loading="lazy"
-        onerror="this.src='logo.jpg'">
-      <div class="member-body">
-        <div class="member-name-row">
-          <h3>${name}</h3>
-          <span class="member-badge">${badge}</span>
+      <div class="member-card-main">
+        <div class="member-photo-column">
+          <img class="member-photo" src="${image}" alt="صورة ${name}" loading="lazy"
+            onerror="this.src='logo.jpg'">
+          ${university ? `<span class="member-university">${university}</span>` : ''}
         </div>
-        ${factsHtml}
+        <div class="member-body">
+          <div class="member-name-row">
+            <h3>${name}</h3>
+            <span class="member-badge">${badge}</span>
+          </div>
+          ${factsHtml}
+        </div>
       </div>
     </article>`;
 }

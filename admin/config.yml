@@ -73,6 +73,7 @@ collections:
               - { label: "الصورة", name: "image", widget: "image", required: false }
               - { label: "الاسم الكامل", name: "name", widget: "string" }
               - { label: "الصفة بجانب الاسم", name: "role", widget: "string", hint: "مثال: الرئيس، الكاتب العام، أمين المال" }
+              - { label: "اختصار الجامعة", name: "university", widget: "string", required: false, hint: "مثال: UM5 أو UIZ — سيظهر أسفل الصورة فقط" }
               - { label: "العمر", name: "age", widget: "string", required: false }
               - { label: "سنة التخرج", name: "promo", widget: "string", required: false }
               - { label: "شعبة الباكالوريا", name: "track", widget: "string", required: false }
@@ -87,6 +88,7 @@ collections:
               - { label: "الصورة", name: "image", widget: "image", required: false }
               - { label: "الاسم الكامل", name: "name", widget: "string" }
               - { label: "الصفة بجانب الاسم", name: "role", widget: "string", default: "عضو", hint: "تظهر شارة ذهبية بجانب الاسم. اتركها «عضو» أو غيّرها." }
+              - { label: "اختصار الجامعة", name: "university", widget: "string", required: false, hint: "مثال: UM5 أو UIZ — سيظهر أسفل الصورة فقط" }
               - { label: "العمر", name: "age", widget: "string", required: false }
               - { label: "سنة التخرج", name: "promo", widget: "string", required: false }
               - { label: "شعبة الباكالوريا", name: "track", widget: "string", required: false }

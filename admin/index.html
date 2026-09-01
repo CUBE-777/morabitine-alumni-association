@@ -29,6 +29,7 @@
     function MemberCard(person, fallbackBadge, getAsset) {
       var name = person.name || 'عضو الجمعية';
       var badge = person.role || fallbackBadge;
+      var university = person.university || '';
       var image = '/logo.jpg';
       if (person.image && getAsset) {
         var asset = getAsset(person.image);
@@ -46,18 +47,23 @@
       });
 
       return h('article', {className: 'preview-card'},
-        h('img', {className: 'preview-photo', src: image, alt: name}),
-        h('div', {className: 'preview-body'},
-          h('div', {className: 'preview-name-row'},
-            h('h3', {}, name),
-            h('span', {className: 'preview-badge'}, badge)
+        h('div', {className: 'preview-main'},
+          h('div', {className: 'preview-photo-column'},
+            h('img', {className: 'preview-photo', src: image, alt: name}),
+            university ? h('span', {className: 'preview-university'}, university) : null
           ),
-          rows.length ? h('ul', {className: 'preview-facts'}, rows.map(function (row) {
-            return h('li', {key: row[0]},
-              h('span', {}, row[0]),
-              h('strong', {}, String(row[1]))
-            );
-          })) : null
+          h('div', {className: 'preview-body'},
+            h('div', {className: 'preview-name-row'},
+              h('h3', {}, name),
+              h('span', {className: 'preview-badge'}, badge)
+            ),
+            rows.length ? h('ul', {className: 'preview-facts'}, rows.map(function (row) {
+              return h('li', {key: row[0]},
+                h('span', {}, row[0]),
+                h('strong', {}, String(row[1]))
+              );
+            })) : null
+          )
         )
       );
     }
