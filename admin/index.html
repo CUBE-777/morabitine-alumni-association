@@ -40,20 +40,21 @@
         ['العمر', person.age],
         ['سنة التخرج', person.promo],
         ['شعبة الباكالوريا', person.track],
-        ['المهنة / التخصص', person.profession]
+        ['المهنة / التخصص', person.profession],
+        ['الجامعة / المعهد', person.profession]
       ].filter(function (row) {
         return row[1] != null && String(row[1]).trim() !== '';
       });
 
-      return h('article', { className: 'preview-card' },
-        h('img', { className: 'preview-photo', src: image, alt: name }),
-        h('div', { className: 'preview-body' },
-          h('div', { className: 'preview-name-row' },
+      return h('article', {className: 'preview-card'},
+        h('img', {className: 'preview-photo', src: image, alt: name}),
+        h('div', {className: 'preview-body'},
+          h('div', {className: 'preview-name-row'},
             h('h3', {}, name),
-            h('span', { className: 'preview-badge' }, badge)
+            h('span', {className: 'preview-badge'}, badge)
           ),
-          rows.length ? h('ul', { className: 'preview-facts' }, rows.map(function (row) {
-            return h('li', { key: row[0] },
+          rows.length ? h('ul', {className: 'preview-facts'}, rows.map(function (row) {
+            return h('li', {key: row[0]},
               h('span', {}, row[0]),
               h('strong', {}, String(row[1]))
             );
@@ -69,23 +70,23 @@
         var board = listToArray(entry.getIn(['data', 'board']));
         var members = listToArray(entry.getIn(['data', 'members']));
 
-        return h('div', { className: 'preview-wrap', dir: 'rtl' },
-          h('p', { className: 'preview-note' }, 'هكذا ستظهر البطاقات للزائر بعد النشر.'),
+        return h('div', {className: 'preview-wrap', dir: 'rtl'},
+          h('p', {className: 'preview-note'}, 'هكذا ستظهر البطاقات للزائر بعد النشر.'),
           h('h2', {}, 'المكتب المسير الحالي'),
-          h('div', { className: 'preview-grid' },
+          h('div', {className: 'preview-grid'},
             board.length
               ? board.map(function (person, i) {
-                return h('div', { key: 'b' + i }, MemberCard(person, 'المكتب المسير', getAsset));
+                return h('div', {key: 'b' + i}, MemberCard(person, 'المكتب المسير', getAsset));
               })
-              : h('p', { className: 'preview-empty' }, 'لم يُضف أحد بعد إلى المكتب المسير.')
+              : h('p', {className: 'preview-empty'}, 'لم يُضف أحد بعد إلى المكتب المسير.')
           ),
           h('h2', {}, 'الأعضاء'),
-          h('div', { className: 'preview-grid' },
+          h('div', {className: 'preview-grid'},
             members.length
               ? members.map(function (person, i) {
-                return h('div', { key: 'm' + i }, MemberCard(person, 'عضو', getAsset));
+                return h('div', {key: 'm' + i}, MemberCard(person, 'عضو', getAsset));
               })
-              : h('p', { className: 'preview-empty' }, 'لم يُضف أعضاء بعد.')
+              : h('p', {className: 'preview-empty'}, 'لم يُضف أعضاء بعد.')
           )
         );
       }
