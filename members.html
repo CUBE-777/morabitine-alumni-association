@@ -131,6 +131,12 @@
 
   <section class="people-page">
     <div class="container">
+      <div class="people-toolbar" role="search">
+        <label class="sr-only" for="peopleSearch">البحث في أعضاء الجمعية</label>
+        <input class="people-search" id="peopleSearch" type="search"
+          placeholder="ابحث بالاسم أو الجامعة أو سنة التخرج" autocomplete="off">
+        <span class="people-count" id="peopleCount" aria-live="polite"></span>
+      </div>
       <div class="members-grid" id="peopleGrid">
         <div class="gallery-empty">جاري تحميل قائمة الأعضاء...</div>
       </div>
@@ -158,6 +164,9 @@
     loadMembersPage({
       listKey: 'members',
       gridId: 'peopleGrid',
+      searchId: 'peopleSearch',
+      countId: 'peopleCount',
+      countLabel: 'عضو',
       fallbackBadge: 'عضو',
       emptyText: 'سيتم إضافة الأعضاء من لوحة الإدارة قريباً.'
     });

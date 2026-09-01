@@ -41,9 +41,33 @@ function memberCardHtml(person, fallbackBadge) {
     </article>`;
 }
 
+function normalizeSearchValue(value) {
+  return String(value == null ? '' : value)
+    .toLocaleLowerCase('ar')
+    .replace(/[\u064B-\u065F\u0670]/g, '')
+    .replace(/ـ/g, '')
+    .replace(/[أإآ]/g, 'ا')
+    .replace(/ى/g, 'ي')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function matchesMemberSearch(person, query) {
+  if (!query) return true;
+  const searchableText = [
+    person.name,
+    person.university,
+    person.promo
+  ].map(normalizeSearchValue).join(' ');
+  return searchableText.includes(query);
+}
+
 function loadMembersPage(options) {
   const grid = document.getElementById(options.gridId);
   if (!grid) return;
+
+  const searchInput = document.getElementById(options.searchId);
+  const countElement = document.getElementById(options.countId);
 
   fetch('content/members.json')
     .then(res => res.ok ? res.json() : { board: [], members: [] })
@@ -53,7 +77,29 @@ function loadMembersPage(options) {
         grid.innerHTML = `<div class="gallery-empty">${options.emptyText}</div>`;
         return;
       }
-      grid.innerHTML = people.map(person => memberCardHtml(person, options.fallbackBadge)).join('');
+
+      function renderPeople() {
+        const query = normalizeSearchValue(searchInput ? searchInput.value : '');
+        const filteredPeople = people.filter(person => matchesMemberSearch(person, query));
+
+        if (countElement) {
+          countElement.textContent = query
+            ? `${filteredPeople.length} نتيجة من أصل ${people.length}`
+            : `${people.length} ${options.countLabel || 'عضو'}`;
+        }
+
+        if (!filteredPeople.length) {
+          grid.innerHTML = '<div class="gallery-empty">لا توجد نتائج مطابقة للبحث.</div>';
+          return;
+        }
+
+        grid.innerHTML = filteredPeople
+          .map(person => memberCardHtml(person, options.fallbackBadge))
+          .join('');
+      }
+
+      if (searchInput) searchInput.addEventListener('input', renderPeople);
+      renderPeople();
     })
     .catch(() => {
       grid.innerHTML = `<div class="gallery-empty">${options.emptyText}</div>`;
