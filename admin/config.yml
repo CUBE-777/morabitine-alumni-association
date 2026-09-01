@@ -77,7 +77,6 @@ collections:
               - { label: "سنة التخرج", name: "promo", widget: "string", required: false }
               - { label: "شعبة الباكالوريا", name: "track", widget: "string", required: false }
               - { label: "التخصص الحالي أو المهنة", name: "profession", widget: "string", required: false }
-              - { label: "الجامعة او المعهد ", name: "profession", widget: "string", required: false }
           - label: "الأعضاء"
             name: "members"
             widget: "list"
@@ -92,5 +91,4 @@ collections:
               - { label: "سنة التخرج", name: "promo", widget: "string", required: false }
               - { label: "شعبة الباكالوريا", name: "track", widget: "string", required: false }
               - { label: "التخصص الحالي أو المهنة", name: "profession", widget: "string", required: false }
-              - { label: "الجامعة او المعهد ", name: "profession", widget: "string", required: false }
 
