@@ -1405,19 +1405,6 @@
     })();
   </script>
 
-  <!-- Netlify Identity: needed so invite/confirmation email links redirect properly to the admin panel -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script>
-    if (window.netlifyIdentity) {
-      window.netlifyIdentity.on('init', user => {
-        if (!user) {
-          window.netlifyIdentity.on('login', () => {
-            document.location.href = '/admin/';
-          });
-        }
-      });
-    }
-  </script>
   <!-- Lightbox Script -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
