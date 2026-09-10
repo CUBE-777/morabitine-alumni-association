@@ -20,16 +20,6 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const ALLOWED_ROLES = ['super_admin', 'editor', 'members_manager'];
 
-function randomTempPassword(): string {
-  // كلمة مرور مؤقتة عشوائية قوية (32 محرف عشوائي base64url تقريبًا)
-  const bytes = new Uint8Array(24);
-  crypto.getRandomValues(bytes);
-  return btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
-
 Deno.serve(async (req: Request) => {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -114,13 +104,16 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const tempPassword = randomTempPassword();
-
-    const { data: created, error: createErr } = await adminClient.auth.admin.createUser({
-      email,
-      password: tempPassword,
-      email_confirm: true,
-    });
+    // إصلاح مهم: كان الكود ينشئ المستخدم عبر auth.admin.createUser() بكلمة مرور
+    // مؤقتة عشوائية، ثم يستدعي auth.admin.generateLink({type:'recovery', ...}).
+    // المشكلة: generateLink() **لا يرسل أي بريد إلكتروني** فعليًا — فقط يُنشئ
+    // الرابط ويُعيده في الاستجابة دون إرساله لأحد. النتيجة الفعلية: كان المسؤول
+    // الجديد لا يستلم أي رسالة أبدًا، فلا يستطيع أبدًا ضبط كلمة مروره أو الدخول،
+    // رغم أن الواجهة تعرض رسالة نجاح تقول إن الرابط "أُرسل" له.
+    // الحل: استخدام auth.admin.inviteUserByEmail() الذي يُنشئ المستخدم **ويرسل**
+    // بريد دعوة فعليًا (باستخدام قالب "Invite user" في إعدادات Supabase Auth)
+    // يحتوي رابطًا لضبط كلمة المرور، في خطوة واحدة.
+    const { data: created, error: createErr } = await adminClient.auth.admin.inviteUserByEmail(email);
     if (createErr || !created?.user) {
       return new Response(JSON.stringify({ error: createErr?.message || 'تعذر إنشاء المستخدم' }), {
         status: 400,
@@ -143,13 +136,6 @@ Deno.serve(async (req: Request) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-
-    // أرسل رابط "استعادة كلمة المرور" للمستخدم الجديد كي يضبط كلمة مروره
-    // الخاصة بدل استخدام كلمة المرور المؤقتة العشوائية.
-    await adminClient.auth.admin.generateLink({
-      type: 'recovery',
-      email,
-    });
 
     return new Response(
       JSON.stringify({ id: created.user.id, message: 'تم إنشاء المستخدم؛ أُرسل له رابط لضبط كلمة المرور.' }),

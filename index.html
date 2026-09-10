@@ -1040,7 +1040,7 @@
     </svg>
     <div class="container">
       <span class="hero-badge">🎓 خريجو ثانوية المرابطين ببيوكرة — جيل يبني على جيل</span>
-      <h1>معاً نبني <em>جسرًا بين الأجيال</em>، من مقاعد الدراسة إلى ميدان العطاء</h1>
+      <h1 id="heroTitle">معاً نبني <em>جسرًا بين الأجيال</em>، من مقاعد الدراسة إلى ميدان العطاء</h1>
       <p>جمعية تجمع خريجي ثانوية المرابطين للحفاظ على أواصر الأخوة، ورد الجميل لمدرستنا، ودعم أجيال التلاميذ القادمة.
       </p>
       <div class="hero-actions">
@@ -1059,7 +1059,7 @@
       <div class="about-grid">
         <div class="about-copy">
           <div class="eyebrow">من نحن</div>
-          <h2 style="font-size:clamp(1.7rem,3.4vw,2.4rem); color:var(--navy-deep); margin-bottom:20px;">قصة جيل يعود
+          <h2 id="aboutTitle" style="font-size:clamp(1.7rem,3.4vw,2.4rem); color:var(--navy-deep); margin-bottom:20px;">قصة جيل يعود
             ليمد يد العون</h2>
           <p>تأسست <strong>جمعية خريجي ثانوية المرابطين</strong> برغبة صادقة من مجموعة من الخريجين في الحفاظ على الرابطة
             التي جمعتهم يوماً على مقاعد الدراسة، وتحويلها إلى عمل جمعوي حقيقي يخدم المدرسة والمجتمع المحلي.</p>
@@ -1223,7 +1223,7 @@
             <li>تمويل برامج المواكبة الدراسية</li>
             <li>المساهمة في الأنشطة والفعاليات</li>
           </ul>
-          <a href="https://wa.me/212679672284?text=السلام%20عليكم%2C%20أرغب%20في%20التبرع%20لدعم%20مشاريع%20الجمعية"
+          <a id="donateWhatsappLink" href="https://wa.me/212679672284?text=السلام%20عليكم%2C%20أرغب%20في%20التبرع%20لدعم%20مشاريع%20الجمعية"
             target="_blank" rel="noopener" class="btn btn-ghost"
             style="color:var(--navy-deep); border-color:var(--navy-deep);">تواصل
             للتبرع</a>
@@ -1241,25 +1241,25 @@
           <ul class="contact-info">
             <li><span class="ico">✉</span>
               <div>
-                <h4>البريد الإلكتروني</h4><span><a href="mailto:a.laureats.almourabitine@gmail.com"
+                <h4>البريد الإلكتروني</h4><span><a id="contactEmail" href="mailto:a.laureats.almourabitine@gmail.com"
                     style="color:#aab6d6;">a.laureats.almourabitine@gmail.com</a></span>
               </div>
             </li>
             <li><span class="ico">☎</span>
               <div>
-                <h4>الهاتف</h4><span><a href="tel:+212679672284" style="color:#aab6d6;">+212 679 672 284</a></span>
+                <h4>الهاتف</h4><span><a id="contactPhone" href="tel:+212679672284" style="color:#aab6d6;">+212 679 672 284</a></span>
               </div>
             </li>
             <li><span class="ico">📍</span>
               <div>
-                <h4>العنوان</h4><span>الثانوية التأهيلية المرابطين، بيوكرة، اشتوكة آيت باها</span>
+                <h4>العنوان</h4><span id="contactAddress">الثانوية التأهيلية المرابطين، بيوكرة، اشتوكة آيت باها</span>
               </div>
             </li>
           </ul>
           <div class="social-row">
-            <a href="#" aria-label="فيسبوك">f</a>
-            <a href="#" aria-label="إنستغرام">📷</a>
-            <a href="https://wa.me/212679672284" target="_blank" rel="noopener" aria-label="واتساب">📱</a>
+            <a id="socialFacebook" href="#" aria-label="فيسبوك">f</a>
+            <a id="socialInstagram" href="#" aria-label="إنستغرام">📷</a>
+            <a id="socialWhatsapp" href="https://wa.me/212679672284" target="_blank" rel="noopener" aria-label="واتساب">📱</a>
           </div>
         </div>
         <form id="contactForm" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field"
@@ -1296,7 +1296,7 @@
         <a href="#join">انخرط معنا</a>
         <a href="#contact">اتصل بنا</a>
       </div>
-      <div class="copyright">© 2026 جمعية خريجي ثانوية المرابطين. جميع الحقوق محفوظة.</div>
+      <div class="copyright" id="footerCopyright">© 2026 جمعية خريجي ثانوية المرابطين. جميع الحقوق محفوظة.</div>
     </div>
   </footer>
 
@@ -1403,6 +1403,159 @@
         `).join('');
       } catch (err) {
         console.error('تعذر تحميل صور المعرض:', err); // يبقى نص العنصر النائب كما هو
+      }
+    })();
+
+    // ===== تحميل الإعدادات العامة (site_settings) وتطبيقها على معلومات التواصل والفوتر =====
+    // ملاحظة: هذا الجزء كان ناقصًا سابقًا — صفحة الإدارة "الإعدادات" كانت تحفظ البيانات
+    // في القاعدة فعليًا، لكن الصفحة الرئيسية لم تكن تقرأها إطلاقًا، فتبقى القيم الثابتة
+    // في الكود هي الظاهرة دائمًا مهما عدّل المسؤول. تم إصلاح ذلك هنا.
+    (async () => {
+      try {
+        const { data, error } = await sb.from('site_settings').select('key, value');
+        if (error) throw error;
+        const settings = {};
+        (data || []).forEach(row => { if (row.value) settings[row.key] = row.value; });
+        if (!Object.keys(settings).length) return; // لا إعدادات محفوظة بعد، يبقى المحتوى الافتراضي
+
+        if (settings.email) {
+          const el = document.getElementById('contactEmail');
+          if (el) { el.href = `mailto:${settings.email}`; el.textContent = settings.email; }
+        }
+        if (settings.phone) {
+          const digits = settings.phone.replace(/[^\d+]/g, '');
+          const el = document.getElementById('contactPhone');
+          if (el) { el.href = `tel:${digits}`; el.textContent = settings.phone; }
+        }
+        if (settings.address) {
+          const el = document.getElementById('contactAddress');
+          if (el) el.textContent = settings.address;
+        }
+        if (settings.whatsapp) {
+          const num = settings.whatsapp.replace(/[^\d]/g, '');
+          const wa = document.getElementById('socialWhatsapp');
+          if (wa) wa.href = `https://wa.me/${num}`;
+          const donate = document.getElementById('donateWhatsappLink');
+          if (donate) {
+            const text = 'السلام عليكم، أرغب في التبرع لدعم مشاريع الجمعية';
+            donate.href = `https://wa.me/${num}?text=${encodeURIComponent(text)}`;
+          }
+        }
+        if (settings.facebook) {
+          const el = document.getElementById('socialFacebook');
+          if (el) el.href = safeUrl(settings.facebook) || '#';
+        }
+        if (settings.instagram) {
+          const el = document.getElementById('socialInstagram');
+          if (el) el.href = safeUrl(settings.instagram) || '#';
+        }
+        if (settings.youtube) {
+          const safeYoutube = safeUrl(settings.youtube);
+          if (safeYoutube) {
+            const row = document.querySelector('.social-row');
+            const wa = document.getElementById('socialWhatsapp');
+            if (row && wa && !document.getElementById('socialYoutube')) {
+              const a = document.createElement('a');
+              a.id = 'socialYoutube';
+              a.href = safeYoutube;
+              a.target = '_blank';
+              a.rel = 'noopener';
+              a.setAttribute('aria-label', 'يوتيوب');
+              a.textContent = '▶';
+              row.insertBefore(a, wa);
+            }
+          }
+        }
+        if (settings.association_name) {
+          document.querySelectorAll('.brand-text').forEach(el => { el.textContent = settings.association_name; });
+        }
+      } catch (err) {
+        console.error('تعذر تحميل الإعدادات العامة:', err); // تبقى القيم الافتراضية كما هي
+      }
+    })();
+
+    // ===== تحميل محتوى الصفحة القابل للتعديل (site_content) — نفس ملاحظة site_settings أعلاه =====
+    (async () => {
+      try {
+        const { data, error } = await sb.from('site_content').select('section, key, value');
+        if (error) throw error;
+        const content = {};
+        (data || []).forEach(row => {
+          if (row.value != null && row.value !== '') content[`${row.section}.${row.key}`] = row.value;
+        });
+        if (!Object.keys(content).length) return;
+
+        // نستخدم textContent وليس innerHTML عمدًا (سلامة ضد XSS)، وهذا يعني أن أي
+        // تنسيق خاص (مثل التمييز بالذهبي في عنوان الواجهة) سيُفقد إن عدّل المسؤول
+        // هذا الحقل من لوحة الإدارة — وهو تنازل مقصود وآمن، وليس خطأ.
+        if (content['homepage.hero_title']) {
+          const el = document.getElementById('heroTitle');
+          if (el) el.textContent = content['homepage.hero_title'];
+        }
+        if (content['homepage.about_title']) {
+          const el = document.getElementById('aboutTitle');
+          if (el) el.textContent = content['homepage.about_title'];
+        }
+        if (content['footer.copyright']) {
+          const el = document.getElementById('footerCopyright');
+          if (el) el.textContent = content['footer.copyright'];
+        }
+      } catch (err) {
+        console.error('تعذر تحميل محتوى الصفحة:', err); // يبقى المحتوى الافتراضي كما هو
+      }
+    })();
+
+    // ===== شريط الإعلانات العلوي (announcements) =====
+    // كان موصوفًا في لوحة الإدارة ("تظهر الإعلانات النشطة فقط في الشريط العلوي بالموقع")
+    // لكنه لم يكن مُنفّذًا إطلاقًا في الصفحة الرئيسية. تم بناؤه هنا: يظهر فقط عند وجود
+    // إعلان نشط ضمن الفترة الزمنية المحددة، ويُخفى تمامًا في الحالات الأخرى (لا تغيير
+    // بصري حين لا توجد إعلانات).
+    (async () => {
+      try {
+        // نطلب النشطة فقط ونفلتر الفترة الزمنية في العميل لتفادي تعقيد جمع أكثر من
+        // شرط OR في نفس الاستعلام؛ سياسة RLS "announcements_public_read_active" تطبّق
+        // نفس الشرط أصلاً على مستوى القاعدة، فهذا تحقق إضافي مضمون وغير حساس للأداء
+        // (عدد الإعلانات صغير جدًا).
+        const now = Date.now();
+        const { data, error } = await sb
+          .from('announcements')
+          .select('id, text, link, start_at, end_at')
+          .eq('is_active', true)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (error) throw error;
+        const active = (data || []).find(row => {
+          const afterStart = !row.start_at || new Date(row.start_at).getTime() <= now;
+          const beforeEnd = !row.end_at || new Date(row.end_at).getTime() >= now;
+          return afterStart && beforeEnd;
+        });
+        if (!active) return;
+        const a = active;
+
+        const bar = document.createElement('div');
+        bar.id = 'announcementBar';
+        bar.setAttribute('dir', 'rtl');
+        bar.style.cssText = `
+          position: relative; z-index: 60; background: linear-gradient(90deg, #173a7d, #081633);
+          color: #fff; text-align: center; padding: 10px 44px; font-size: .88rem;
+          font-family: 'Tajawal', sans-serif; line-height: 1.6;
+        `;
+        const link = safeUrl(a.link);
+        bar.innerHTML = `<span>${escapeHtml(a.text)}</span>${link ? ` <a href="${escapeAttr(link)}" style="color:#f2a93b; font-weight:700; text-decoration:underline;">التفاصيل ←</a>` : ''}`;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.setAttribute('aria-label', 'إغلاق الإعلان');
+        closeBtn.textContent = '×';
+        closeBtn.style.cssText = `
+          position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+          background: none; border: none; color: #fff; font-size: 1.3rem; cursor: pointer; line-height: 1;
+        `;
+        closeBtn.addEventListener('click', () => bar.remove());
+        bar.appendChild(closeBtn);
+
+        document.body.insertBefore(bar, document.body.firstChild);
+      } catch (err) {
+        console.error('تعذر تحميل الإعلانات:', err); // لا يظهر أي شريط، بدون كسر بقية الصفحة
       }
     })();
   </script>

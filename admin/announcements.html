@@ -96,15 +96,21 @@ async function save(existing) {
       text,
       link: document.getElementById('f_link').value.trim() || null,
       start_at: document.getElementById('f_start').value || null,
-      end_at: document.getElementById('f_end').value || null,
+      // إصلاح: كان تاريخ النهاية يُحفظ كمنتصف ليل ذلك اليوم (00:00:00)، فتصبح سياسة
+      // RLS "end_at >= now()" تُخفي الإعلان منذ بداية آخر يوم فعليًا بدل نهايته —
+      // أي أن اختيار "ينتهي اليوم" كان يُخفي الإعلان فورًا تقريبًا. الآن يُحفظ في
+      // نهاية اليوم المختار (23:59:59) ليبقى ظاهرًا طوال اليوم الأخير كما هو متوقع.
+      end_at: document.getElementById('f_end').value ? `${document.getElementById('f_end').value}T23:59:59` : null,
       is_active: document.getElementById('f_active').checked
     };
     if (existing) {
       const { error } = await sb.from('announcements').update(payload).eq('id', existing.id);
       if (error) throw error;
+      await Auth.log('ADMIN_UPDATED_ANNOUNCEMENT', 'announcements', existing.id, `تعديل إعلان: ${text.slice(0, 60)}`);
     } else {
-      const { error } = await sb.from('announcements').insert(payload);
+      const { data, error } = await sb.from('announcements').insert(payload).select().single();
       if (error) throw error;
+      await Auth.log('ADMIN_CREATED_ANNOUNCEMENT', 'announcements', data?.id || null, `إضافة إعلان جديد: ${text.slice(0, 60)}`);
     }
     t.remove(); notify.success('تم الحفظ بنجاح'); load();
   } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحفظ'); }
@@ -123,6 +129,7 @@ function confirmDelete(a) {
     try {
       const { error } = await sb.from('announcements').delete().eq('id', a.id);
       if (error) throw error;
+      await Auth.log('ADMIN_DELETED_ANNOUNCEMENT', 'announcements', a.id, `حذف إعلان: ${(a.text || '').slice(0, 60)}`);
       t.remove(); notify.success('تم الحذف'); load();
     } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحذف'); }
   };

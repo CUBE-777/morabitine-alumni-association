@@ -104,7 +104,7 @@ async function handleUpload(e) {
 function openEdit(g) {
   openModal(`
     <h3>تعديل الصورة</h3>
-    <img src="${g.image_url}" style="width:100%; border-radius:10px; margin-bottom:14px;">
+    <img src="${attr(g.image_url)}" style="width:100%; border-radius:10px; margin-bottom:14px;">
     <div class="form-group"><label>العنوان</label><input id="f_title" value="${attr(g.title)}"></div>
     <div class="form-group"><label>الوصف</label><textarea id="f_desc">${esc(g.description || '')}</textarea></div>
     <div class="form-group"><label>ربط بنشاط</label>
@@ -128,6 +128,7 @@ function openEdit(g) {
         activity_id: document.getElementById('f_activity').value || null
       }).eq('id', g.id);
       if (error) throw error;
+      await Auth.log('ADMIN_UPDATED_IMAGE', 'gallery', g.id, 'تعديل بيانات صورة في المعرض');
       t.remove(); notify.success('تم الحفظ'); load();
     } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحفظ'); }
   };

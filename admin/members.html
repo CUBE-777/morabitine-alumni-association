@@ -146,6 +146,9 @@ function openMemberForm(member) {
     <h3>${isEdit ? 'تعديل عضو' : 'إضافة عضو جديد'}</h3>
     <form id="memberForm">
       <div class="form-group"><label>الاسم الكامل *</label><input required id="f_full_name" value="${escapeAttr(member?.full_name)}"></div>
+      <div class="form-group"><label>الصورة الشخصية</label><input type="file" id="f_photo" accept="image/*">
+        ${member?.photo_url ? `<div style="font-size:.8rem;color:var(--muted);margin-top:4px;">صورة حالية موجودة، اختر ملفًا جديدًا فقط لاستبدالها.</div>` : ''}
+      </div>
       <div class="form-row-2">
         <div class="form-group"><label>الدفعة</label><input id="f_promotion" value="${escapeAttr(member?.promotion)}"></div>
         <div class="form-group"><label>الشعبة</label><input id="f_track" value="${escapeAttr(member?.track)}"></div>
@@ -191,6 +194,14 @@ async function saveMember(existing) {
   closeModal();
   const t = notify.loading(existing ? 'جاري حفظ التعديلات...' : 'جاري إضافة العضو...');
   try {
+    // إصلاح: لم تكن هذه الصفحة تحتوي على أي حقل لرفع الصورة الشخصية رغم أن
+    // عمود photo_url موجود في القاعدة، والموقع العام يعرضه فعليًا لكل عضو
+    // (js/members.js)، وسياسات تخزين association-media تسمح بذلك أصلاً لمجلد
+    // members/ — كانت الفجوة في الواجهة فقط.
+    const fileInput = document.getElementById('f_photo');
+    if (fileInput && fileInput.files[0]) {
+      payload.photo_url = await uploadFile(fileInput.files[0], 'members');
+    }
     if (existing) {
       const { error } = await sb.from('members').update(payload).eq('id', existing.id);
       if (error) throw error;
@@ -256,6 +267,16 @@ async function exportCsv() {
 }
 
 function val(id) { return document.getElementById(id).value.trim(); }
+async function uploadFile(file, folder) {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  if (!allowed.includes(file.type)) throw new Error('نوع الملف غير مدعوم، استخدم صورة JPG أو PNG أو WEBP.');
+  if (file.size > 5 * 1024 * 1024) throw new Error('حجم الملف أكبر من 5MB.');
+  const path = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+  const { error } = await sb.storage.from('association-media').upload(path, file, { upsert: false });
+  if (error) throw error;
+  const { data } = sb.storage.from('association-media').getPublicUrl(path);
+  return data.publicUrl;
+}
 function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
 function openModal(html) {
   closeModal();

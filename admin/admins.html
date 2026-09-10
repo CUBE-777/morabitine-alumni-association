@@ -113,6 +113,10 @@ async function save(existing) {
         is_active: document.getElementById('f_active').checked
       }).eq('id', existing.id);
       if (error) throw error;
+      // إصلاح: هذه الصفحة (إدارة المسؤولين) لم تكن تسجّل أي عملية في audit_logs
+      // إطلاقًا رغم أنها الأكثر حساسية أمنيًا في كامل لوحة الإدارة (منح/سحب صلاحيات
+      // الدخول والأدوار). تم إضافة التسجيل هنا.
+      await Auth.log('ADMIN_UPDATED_ADMIN', 'profiles', existing.id, `تعديل صلاحيات المسؤول ${full_name} (${email}) — الدور: ${roleLabel(role)}`);
       t.remove(); notify.success('تم الحفظ بنجاح'); load();
     } else {
       // إنشاء المسؤول بالكامل على الخادم عبر Edge Function (يستخدم service_role
@@ -122,6 +126,7 @@ async function save(existing) {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
+      await Auth.log('ADMIN_CREATED_ADMIN', 'profiles', data?.id || null, `إنشاء مسؤول جديد: ${full_name} (${email}) — الدور: ${roleLabel(role)}`);
       t.remove();
       notify.success('تم إنشاء المسؤول بنجاح، وأُرسل له رابط لضبط كلمة المرور.');
       load();
@@ -135,7 +140,7 @@ async function save(existing) {
 function confirmDelete(p) {
   openModal(`
     <h3>إزالة صلاحية الوصول</h3>
-    <p>سيفقد <strong>${esc(p.full_name)}</strong> إمكانية الدخول إلى لوحة الإدارة (لن يُحذف حسابه من Supabase Auth).</p>
+    <p>سيفقد <strong>${esc(p.full_name)}</strong> إمكانية الدخول إلى لوحة الإدارة فورًا (لن يُحذف حسابه من Supabase Auth، ويمكن إعادة تفعيله لاحقًا من هذه الصفحة عبر "تعديل").</p>
     <div class="modal-actions">
       <button class="btn btn-danger" id="confirmBtn">إزالة</button>
       <button class="btn btn-outline" data-close>إلغاء</button>
@@ -144,8 +149,14 @@ function confirmDelete(p) {
     closeModal();
     const t = notify.loading('جاري التنفيذ...');
     try {
-      const { error } = await sb.from('profiles').delete().eq('id', p.id);
+      // ملاحظة إصلاح: كانت هذه العملية تحذف صف profiles نهائيًا (delete)، رغم أن
+      // نص التأكيد يَعِد بأن الحساب "لن يُحذف" ويوحي بأن الأمر قابل للتراجع. الحذف
+      // النهائي كان يفقد الاسم/الدور نهائيًا ويمنع أي إعادة تفعيل من الواجهة (زر
+      // "تعديل" يختفي مع الصف). تم تصحيحها لتصبح تعطيلاً (is_active = false) فعليًا،
+      // بما يطابق النص المعروض للمستخدم ويسمح بإعادة التفعيل من "تعديل".
+      const { error } = await sb.from('profiles').update({ is_active: false }).eq('id', p.id);
       if (error) throw error;
+      await Auth.log('ADMIN_DEACTIVATED_ADMIN', 'profiles', p.id, `إزالة صلاحية الوصول عن المسؤول ${p.full_name} (${p.email})`);
       t.remove(); notify.success('تمت إزالة صلاحية الوصول'); load();
     } catch (err) { t.remove(); notify.fromError(err, 'تعذر التنفيذ'); }
   };
