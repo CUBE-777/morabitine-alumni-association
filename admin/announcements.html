@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>الإعلانات — لوحة إدارة الجمعية</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,7 +10,7 @@
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/notifications.js"></script>
 <script src="../js/auth.js"></script>
@@ -70,7 +71,7 @@ function openForm(a) {
   openModal(`
     <h3>${a ? 'تعديل' : 'إضافة'} إعلان</h3>
     <form id="f">
-      <div class="form-group"><label>نص الإعلان *</label><textarea required id="f_text">${a?.text || ''}</textarea></div>
+      <div class="form-group"><label>نص الإعلان *</label><textarea required id="f_text">${esc(a?.text || '')}</textarea></div>
       <div class="form-group"><label>رابط (اختياري)</label><input id="f_link" value="${attr(a?.link)}"></div>
       <div class="form-row-2">
         <div class="form-group"><label>تاريخ البداية</label><input type="date" id="f_start" value="${a?.start_at ? a.start_at.substring(0,10) : ''}"></div>

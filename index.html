@@ -1301,8 +1301,10 @@
   </footer>
 
   <!-- Supabase Client (Phase 2: اتصال أساسي، لم يُستخدم بعد في عرض البيانات) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.4.0/dist/purify.min.js"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/utils.js"></script>
   <script src="js/notifications.js"></script>
 
   <script>
@@ -1371,8 +1373,8 @@
         grid.innerHTML = data.map((a, i) => `
           <div class="activity-card">
             <div class="activity-icon">${icons[i % icons.length]}</div>
-            <h3>${a.title}</h3>
-            <p>${(a.description || '').replace(/<[^>]*>/g, '').slice(0, 140)}</p>
+            <h3>${escapeHtml(a.title)}</h3>
+            <p>${escapeHtml((a.description || '').replace(/<[^>]*>/g, '').slice(0, 140))}</p>
             <a href="activity.html?id=${encodeURIComponent(a.slug)}" class="btn btn-ghost">عرض التفاصيل ←</a>
           </div>
         `).join('');
@@ -1395,8 +1397,8 @@
         if (!data || !data.length) return; // يبقى نص العنصر النائب كما هو
         grid.innerHTML = data.map(item => `
           <figure class="gallery-item">
-            <img src="${item.image_url}" alt="${item.title || item.description || 'صورة من أنشطة الجمعية'}" loading="lazy">
-            ${item.title ? `<figcaption>${item.title}</figcaption>` : ''}
+            <img src="${escapeAttr(safeUrl(item.image_url))}" alt="${escapeAttr(item.title || item.description || 'صورة من أنشطة الجمعية')}" loading="lazy">
+            ${item.title ? `<figcaption>${escapeHtml(item.title)}</figcaption>` : ''}
           </figure>
         `).join('');
       } catch (err) {

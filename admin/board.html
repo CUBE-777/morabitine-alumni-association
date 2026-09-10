@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
 <title>أعضاء المكتب — لوحة إدارة الجمعية</title>
 <link rel="icon" href="../logo.jpg" type="image/jpeg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,7 +10,7 @@
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
 <script src="../js/supabase.js"></script>
 <script src="../js/notifications.js"></script>
 <script src="../js/auth.js"></script>
@@ -86,7 +87,7 @@ function openForm(b) {
       <div class="form-group"><label>الاسم الكامل *</label><input required id="f_name" value="${attr(b?.full_name)}"></div>
       <div class="form-group"><label>الصفة *</label><input required id="f_position" value="${attr(b?.position)}" placeholder="مثال: الرئيس، الكاتب العام..."></div>
       <div class="form-group"><label>الجامعة/الإطار</label><input id="f_uni" value="${attr(b?.university)}"></div>
-      <div class="form-group"><label>نبذة</label><textarea id="f_bio">${b?.bio || ''}</textarea></div>
+      <div class="form-group"><label>نبذة</label><textarea id="f_bio">${esc(b?.bio || '')}</textarea></div>
       <div class="form-group">
         <label><input type="checkbox" id="f_active" ${b?.is_active !== false ? 'checked' : ''}> نشط ويظهر في الموقع</label>
       </div>

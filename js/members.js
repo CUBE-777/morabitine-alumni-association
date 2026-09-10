@@ -71,7 +71,9 @@ function memberRowToPerson(row) {
     name: row.full_name,
     role: 'عضو الجمعية',
     university: row.university,
-    age: row.age,
+    // ملاحظة أمان/خصوصية: لا يُطلب حقل "age" هنا لأن قاعدة البيانات لا تمنح
+    // anon صلاحية قراءته إطلاقًا (انظر supabase/migrations/0007_member_privacy.sql).
+    // نفس الأمر بالنسبة لـ email/phone/city — تبقى خاصة بالإدارة فقط.
     promo: row.promotion,
     track: row.track,
     profession: row.profession,
@@ -100,15 +102,18 @@ async function fetchPeopleFromSupabase(listKey) {
   if (listKey === 'board') {
     const { data, error } = await sb
       .from('board_members')
-      .select('*')
+      .select('id, full_name, position, photo_url, university, bio, sort_order, is_active')
       .eq('is_active', true)
       .order('sort_order', { ascending: true });
     if (error) throw error;
     return (data || []).map(boardRowToPerson);
   }
+  // نطلب فقط الأعمدة العامة غير الحساسة. لا نطلب email/phone/age/city/bio؛
+  // قاعدة البيانات ترفضها أصلاً لدور anon (0007_member_privacy.sql) وهذا
+  // يجعل نية الكود واضحة ويمنع رسالة خطأ غامضة في الطلب.
   const { data, error } = await sb
     .from('members')
-    .select('*')
+    .select('id, full_name, photo_url, promotion, track, university, profession, status, created_at, deleted_at')
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('created_at', { ascending: false });

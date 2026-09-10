@@ -1,0 +1,38 @@
+# netlify.toml
+# إعدادات النشر + رؤوس أمان (Security Headers) على مستوى Netlify.
+# ملاحظة: تم اختيار قيم CSP بعناية لتبقى متوافقة مع:
+#  - Supabase (REST + Auth + Storage) عبر https://qkankovqhgofaytkcuat.supabase.co
+#  - Google Fonts (fonts.googleapis.com + fonts.gstatic.com)
+#  - jsDelivr (supabase-js و DOMPurify)
+# اختبر أي تعديل لاحق على CSP في بيئة معاينة (deploy preview) قبل الدمج في main،
+# لتفادي كسر تحميل الخطوط أو استدعاءات Supabase.
+
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), payment=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
+      style-src 'self' https://fonts.googleapis.com 'unsafe-inline';
+      font-src 'self' https://fonts.gstatic.com;
+      img-src 'self' data: https: blob:;
+      connect-src 'self' https://qkankovqhgofaytkcuat.supabase.co wss://qkankovqhgofaytkcuat.supabase.co;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self';
+      object-src 'none';
+    """
+
+# لا فهرسة لصفحات لوحة الإدارة عبر محركات البحث (طبقة إضافية فوق noindex meta)
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"

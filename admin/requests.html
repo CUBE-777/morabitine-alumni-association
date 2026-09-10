@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
   <title>طلبات الانخراط — لوحة إدارة الجمعية</title>
   <link rel="icon" href="../logo.jpg" type="image/jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,7 +16,7 @@
   </style>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
   <script src="../js/supabase.js"></script>
   <script src="../js/notifications.js"></script>
   <script src="../js/auth.js"></script>
@@ -154,10 +155,10 @@
       closeModal();
       const loadingToast = notify.loading('جاري قبول الطلب...');
       try {
-        const session = await Auth.getSession();
+        // الدالة تحدّد المراجع تلقائيًا عبر auth.uid() داخل قاعدة البيانات،
+        // لا نرسل معرّف المستخدم من العميل (انظر 0006_security_hardening.sql).
         const { error } = await sb.rpc('approve_membership_request', {
-          p_request_id: r.id,
-          p_reviewer_id: session.user.id
+          p_request_id: r.id
         });
         if (error) throw error;
         loadingToast.remove();
@@ -190,10 +191,9 @@
       closeModal();
       const loadingToast = notify.loading('جاري رفض الطلب...');
       try {
-        const session = await Auth.getSession();
+        // نفس الأمر هنا: المراجع يُشتق من الجلسة داخل قاعدة البيانات.
         const { error } = await sb.rpc('reject_membership_request', {
           p_request_id: r.id,
-          p_reviewer_id: session.user.id,
           p_reason: reason || null
         });
         if (error) throw error;

@@ -52,7 +52,7 @@ const AdminLayout = {
           <nav class="sidebar-nav">${navHtml}</nav>
           <div class="sidebar-footer">
             <div style="font-size:.8rem; color:rgba(255,255,255,.7); margin-bottom:10px;">
-              ${profile.full_name} <br><span style="color:var(--gold-light);">${this.roleLabel(profile.role)}</span>
+              ${AdminLayout.escapeHtml(profile.full_name)} <br><span style="color:var(--gold-light);">${this.roleLabel(profile.role)}</span>
             </div>
             <button class="sidebar-logout" id="logoutBtn">تسجيل الخروج</button>
           </div>
@@ -78,5 +78,14 @@ const AdminLayout = {
 
   roleLabel(role) {
     return { super_admin: 'مسؤول أعلى', editor: 'محرر', members_manager: 'مسؤول الأعضاء' }[role] || role;
+  },
+
+  escapeHtml(value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
 };
