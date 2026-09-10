@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المستخدمون الإداريون — لوحة إدارة الجمعية</title>
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script>
+let myId = null;
+
+(async function init() {
+  const profile = await Auth.requireAuth(['super_admin']);
+  if (!profile) return;
+  myId = profile.id;
+  const main = AdminLayout.render(profile, 'admins');
+  main.innerHTML = `
+    <div class="page-header">
+      <div><h1>المستخدمون الإداريون</h1><div class="page-subtitle">إدارة صلاحيات الوصول إلى لوحة الإدارة</div></div>
+      <button class="btn btn-primary" id="addBtn">+ ربط مستخدم كمسؤول</button>
+    </div>
+    <div class="panel" style="background:#fef3e0; border-color:#f2c98a;">
+      <p style="font-size:.86rem; color:#7a4e07;">
+        لإنشاء حساب دخول جديد: أنشئه أولاً من <strong>Supabase Dashboard → Authentication → Users → Add user</strong> (بريد وكلمة مرور)،
+        ثم انسخ الـ UUID الخاص به واستخدم زر "ربط مستخدم كمسؤول" هنا لمنحه صلاحية الدخول للوحة.
+      </p>
+    </div>
+    <div class="panel"><div id="list" class="state-box">جاري التحميل...</div></div>
+  `;
+  document.getElementById('addBtn').onclick = () => openForm(null);
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('list');
+  el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+  try {
+    const { data, error } = await sb.from('profiles').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    el.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>${data.map(p => `
+          <tr data-id="${p.id}">
+            <td>${esc(p.full_name)} ${p.id === myId ? '<span class="badge badge-active">أنت</span>' : ''}</td>
+            <td>${esc(p.email)}</td>
+            <td>${roleLabel(p.role)}</td>
+            <td><span class="badge badge-${p.is_active ? 'active' : 'inactive'}">${p.is_active ? 'نشط' : 'معطّل'}</span></td>
+            <td style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" data-action="edit">تعديل</button>
+              ${p.id !== myId ? `<button class="btn btn-danger btn-sm" data-action="delete">إزالة الصلاحية</button>` : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    el.querySelectorAll('[data-action="edit"]').forEach(b => b.onclick = () => openForm(find(data, b)));
+    el.querySelectorAll('[data-action="delete"]').forEach(b => b.onclick = () => confirmDelete(find(data, b)));
+  } catch (err) {
+    notify.fromError(err, 'تعذر تحميل المستخدمين');
+    el.innerHTML = '<div class="state-box">تعذر التحميل.</div>';
+  }
+}
+
+function find(data, btn) { return data.find(x => x.id === btn.closest('tr').dataset.id); }
+function roleLabel(r) { return { super_admin: 'مسؤول أعلى', editor: 'محرر', members_manager: 'مسؤول الأعضاء' }[r] || r; }
+
+function openForm(p) {
+  const isEdit = !!p;
+  openModal(`
+    <h3>${isEdit ? 'تعديل صلاحيات' : 'ربط مستخدم كمسؤول'}</h3>
+    <form id="f">
+      ${!isEdit ? `<div class="form-group"><label>UUID المستخدم (من Supabase Auth) *</label><input required id="f_id" placeholder="00000000-0000-0000-0000-000000000000"></div>` : ''}
+      <div class="form-group"><label>الاسم الكامل *</label><input required id="f_name" value="${attr(p?.full_name)}"></div>
+      <div class="form-group"><label>البريد الإلكتروني *</label><input required type="email" id="f_email" value="${attr(p?.email)}"></div>
+      <div class="form-group"><label>الدور</label>
+        <select id="f_role">
+          <option value="editor" ${p?.role === 'editor' ? 'selected' : ''}>محرر</option>
+          <option value="members_manager" ${p?.role === 'members_manager' ? 'selected' : ''}>مسؤول الأعضاء</option>
+          <option value="super_admin" ${p?.role === 'super_admin' ? 'selected' : ''}>مسؤول أعلى</option>
+        </select>
+      </div>
+      <div class="form-group"><label><input type="checkbox" id="f_active" ${p?.is_active !== false ? 'checked' : ''}> حساب نشط</label></div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">حفظ</button>
+        <button type="button" class="btn btn-outline" data-close>إلغاء</button>
+      </div>
+    </form>`);
+  document.getElementById('f').onsubmit = (e) => { e.preventDefault(); save(p); };
+}
+
+async function save(existing) {
+  const full_name = document.getElementById('f_name').value.trim();
+  const email = document.getElementById('f_email').value.trim();
+  if (!full_name || !email) { notify.error('الاسم والبريد مطلوبان'); return; }
+  closeModal();
+  const t = notify.loading('جاري الحفظ...');
+  try {
+    if (existing) {
+      const { error } = await sb.from('profiles').update({
+        full_name, email,
+        role: document.getElementById('f_role').value,
+        is_active: document.getElementById('f_active').checked
+      }).eq('id', existing.id);
+      if (error) throw error;
+    } else {
+      const id = document.getElementById('f_id').value.trim();
+      if (!id) { throw new Error('UUID المستخدم مطلوب'); }
+      const { error } = await sb.from('profiles').insert({
+        id, full_name, email,
+        role: document.getElementById('f_role').value,
+        is_active: document.getElementById('f_active').checked
+      });
+      if (error) throw error;
+    }
+    t.remove(); notify.success('تم الحفظ بنجاح'); load();
+  } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحفظ، تأكد أن الـ UUID صحيح ولم يُربط سابقًا.'); }
+}
+
+function confirmDelete(p) {
+  openModal(`
+    <h3>إزالة صلاحية الوصول</h3>
+    <p>سيفقد <strong>${esc(p.full_name)}</strong> إمكانية الدخول إلى لوحة الإدارة (لن يُحذف حسابه من Supabase Auth).</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirmBtn">إزالة</button>
+      <button class="btn btn-outline" data-close>إلغاء</button>
+    </div>`);
+  document.getElementById('confirmBtn').onclick = async () => {
+    closeModal();
+    const t = notify.loading('جاري التنفيذ...');
+    try {
+      const { error } = await sb.from('profiles').delete().eq('id', p.id);
+      if (error) throw error;
+      t.remove(); notify.success('تمت إزالة صلاحية الوصول'); load();
+    } catch (err) { t.remove(); notify.fromError(err, 'تعذر التنفيذ'); }
+  };
+}
+
+function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function attr(v) { return esc(v); }
+function openModal(html) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay'; overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal-box">${html}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.hasAttribute('data-close')) closeModal(); });
+}
+function closeModal() { const el = document.getElementById('modalOverlay'); if (el) el.remove(); }
+</script>
+</body>
+</html>

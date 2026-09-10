@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>طلبات الانخراط — لوحة إدارة الجمعية</title>
+  <link rel="icon" href="../logo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .tabs { display: flex; gap: 6px; margin-bottom: 18px; border-bottom: 1px solid var(--border); }
+    .tab-btn { padding: 10px 18px; background: none; border: none; font-size: .9rem; font-weight: 700; color: var(--muted); border-bottom: 3px solid transparent; }
+    .tab-btn.active { color: var(--navy-deep); border-color: var(--gold); }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/notifications.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin-layout.js"></script>
+
+  <script>
+    let currentTab = 'pending';
+    let currentProfile = null;
+
+    (async function init() {
+      const profile = await Auth.requireAuth(['super_admin', 'members_manager']);
+      if (!profile) return;
+      currentProfile = profile;
+
+      const main = AdminLayout.render(profile, 'requests');
+      main.innerHTML = `
+        <div class="page-header">
+          <div>
+            <h1>طلبات الانخراط</h1>
+            <div class="page-subtitle">مراجعة طلبات الانضمام إلى الجمعية والموافقة عليها أو رفضها</div>
+          </div>
+        </div>
+        <div class="tabs" id="tabs">
+          <button class="tab-btn active" data-tab="pending">قيد الانتظار</button>
+          <button class="tab-btn" data-tab="approved">مقبولة</button>
+          <button class="tab-btn" data-tab="rejected">مرفوضة</button>
+        </div>
+        <div class="panel">
+          <div id="requestsList" class="state-box">جاري التحميل...</div>
+        </div>
+      `;
+
+      document.getElementById('tabs').addEventListener('click', (e) => {
+        if (e.target.dataset.tab) {
+          currentTab = e.target.dataset.tab;
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === currentTab));
+          loadRequests();
+        }
+      });
+
+      loadRequests();
+    })();
+
+    async function loadRequests() {
+      const el = document.getElementById('requestsList');
+      el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+      try {
+        const { data, error } = await sb
+          .from('membership_requests')
+          .select('*')
+          .eq('status', currentTab)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+
+        if (!data.length) {
+          el.innerHTML = `<div class="state-box">لا توجد طلبات ${tabLabel(currentTab)} حاليًا.</div>`;
+          return;
+        }
+
+        el.innerHTML = `
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>الاسم</th><th>البريد</th><th>الهاتف</th><th>الدفعة</th><th>المدينة</th><th>التاريخ</th><th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.map(rowHtml).join('')}
+            </tbody>
+          </table>
+        `;
+
+        el.querySelectorAll('[data-action="view"]').forEach(btn => btn.addEventListener('click', () => showDetails(findRow(data, btn))));
+        el.querySelectorAll('[data-action="approve"]').forEach(btn => btn.addEventListener('click', () => confirmApprove(findRow(data, btn))));
+        el.querySelectorAll('[data-action="reject"]').forEach(btn => btn.addEventListener('click', () => showRejectModal(findRow(data, btn))));
+      } catch (err) {
+        notify.fromError(err, 'تعذر تحميل الطلبات');
+        el.innerHTML = '<div class="state-box">تعذر تحميل الطلبات.</div>';
+      }
+    }
+
+    function findRow(data, btn) {
+      const id = btn.closest('tr').dataset.id;
+      return data.find(r => r.id === id);
+    }
+
+    function rowHtml(r) {
+      return `
+        <tr data-id="${r.id}">
+          <td>${escapeHtml(r.full_name)}</td>
+          <td>${escapeHtml(r.email)}</td>
+          <td>${escapeHtml(r.phone || '—')}</td>
+          <td>${escapeHtml(r.promotion || '—')}</td>
+          <td>${escapeHtml(r.city || '—')}</td>
+          <td>${new Date(r.created_at).toLocaleDateString('ar-MA')}</td>
+          <td style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" data-action="view">عرض</button>
+            ${currentTab === 'pending' ? `
+              <button class="btn btn-primary btn-sm" data-action="approve">قبول</button>
+              <button class="btn btn-danger btn-sm" data-action="reject">رفض</button>
+            ` : ''}
+          </td>
+        </tr>
+      `;
+    }
+
+    function showDetails(r) {
+      openModal(`
+        <h3>تفاصيل الطلب</h3>
+        <p><strong>الاسم:</strong> ${escapeHtml(r.full_name)}</p>
+        <p><strong>البريد:</strong> ${escapeHtml(r.email)}</p>
+        <p><strong>الهاتف:</strong> ${escapeHtml(r.phone || '—')}</p>
+        <p><strong>الدفعة:</strong> ${escapeHtml(r.promotion || '—')}</p>
+        <p><strong>الشعبة:</strong> ${escapeHtml(r.track || '—')}</p>
+        <p><strong>المهنة:</strong> ${escapeHtml(r.profession || '—')}</p>
+        <p><strong>المدينة:</strong> ${escapeHtml(r.city || '—')}</p>
+        <p><strong>الرسالة:</strong> ${escapeHtml(r.message || '—')}</p>
+        ${r.rejection_reason ? `<p><strong>سبب الرفض:</strong> ${escapeHtml(r.rejection_reason)}</p>` : ''}
+        <div class="modal-actions"><button class="btn btn-outline" data-close>إغلاق</button></div>
+      `);
+    }
+
+    function confirmApprove(r) {
+      openModal(`
+        <h3>تأكيد القبول</h3>
+        <p>سيتم قبول طلب <strong>${escapeHtml(r.full_name)}</strong> وتحويله تلقائيًا إلى عضو نشط في الجمعية. هل تريد المتابعة؟</p>
+        <div class="modal-actions">
+          <button class="btn btn-primary" id="confirmApproveBtn">تأكيد القبول</button>
+          <button class="btn btn-outline" data-close>إلغاء</button>
+        </div>
+      `);
+      document.getElementById('confirmApproveBtn').addEventListener('click', () => doApprove(r));
+    }
+
+    async function doApprove(r) {
+      closeModal();
+      const loadingToast = notify.loading('جاري قبول الطلب...');
+      try {
+        const session = await Auth.getSession();
+        const { error } = await sb.rpc('approve_membership_request', {
+          p_request_id: r.id,
+          p_reviewer_id: session.user.id
+        });
+        if (error) throw error;
+        loadingToast.remove();
+        notify.success('تمت الموافقة على الطلب وتحويله إلى عضو بنجاح');
+        loadRequests();
+      } catch (err) {
+        loadingToast.remove();
+        notify.fromError(err, 'تعذر قبول الطلب');
+      }
+    }
+
+    function showRejectModal(r) {
+      openModal(`
+        <h3>رفض الطلب</h3>
+        <p>رفض طلب <strong>${escapeHtml(r.full_name)}</strong>.</p>
+        <div class="form-group">
+          <label for="rejectReason">سبب الرفض (اختياري)</label>
+          <textarea id="rejectReason" placeholder="اكتب السبب إن وجد..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-danger" id="confirmRejectBtn">تأكيد الرفض</button>
+          <button class="btn btn-outline" data-close>إلغاء</button>
+        </div>
+      `);
+      document.getElementById('confirmRejectBtn').addEventListener('click', () => doReject(r));
+    }
+
+    async function doReject(r) {
+      const reason = document.getElementById('rejectReason').value.trim();
+      closeModal();
+      const loadingToast = notify.loading('جاري رفض الطلب...');
+      try {
+        const session = await Auth.getSession();
+        const { error } = await sb.rpc('reject_membership_request', {
+          p_request_id: r.id,
+          p_reviewer_id: session.user.id,
+          p_reason: reason || null
+        });
+        if (error) throw error;
+        loadingToast.remove();
+        notify.success('تم رفض الطلب');
+        loadRequests();
+      } catch (err) {
+        loadingToast.remove();
+        notify.fromError(err, 'تعذر رفض الطلب');
+      }
+    }
+
+    function tabLabel(t) { return { pending: 'قيد الانتظار', approved: 'مقبولة', rejected: 'مرفوضة' }[t] || t; }
+
+    function openModal(innerHtml) {
+      closeModal();
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.id = 'modalOverlay';
+      overlay.innerHTML = `<div class="modal-box">${innerHtml}</div>`;
+      document.body.appendChild(overlay);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay || e.target.hasAttribute('data-close')) closeModal();
+      });
+    }
+    function closeModal() {
+      const el = document.getElementById('modalOverlay');
+      if (el) el.remove();
+    }
+    function escapeHtml(v) {
+      return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>

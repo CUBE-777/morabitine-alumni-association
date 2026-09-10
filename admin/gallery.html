@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>معرض الصور — لوحة إدارة الجمعية</title>
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<style>
+  .media-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; }
+  .media-item { background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .media-item img { width:100%; height:130px; object-fit:cover; display:block; }
+  .media-item .media-body { padding:10px; }
+  .media-item .media-actions { display:flex; gap:6px; padding:0 10px 10px; }
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script>
+let activitiesCache = [];
+
+(async function init() {
+  const profile = await Auth.requireAuth(['super_admin', 'editor']);
+  if (!profile) return;
+  const main = AdminLayout.render(profile, 'gallery');
+  main.innerHTML = `
+    <div class="page-header">
+      <div><h1>معرض الصور</h1><div class="page-subtitle">رفع وإدارة صور المعرض العام</div></div>
+      <label class="btn btn-primary" style="cursor:pointer;">
+        + رفع صور
+        <input type="file" id="uploadInput" accept="image/*" multiple style="display:none;">
+      </label>
+    </div>
+    <div class="panel"><div id="list" class="state-box">جاري التحميل...</div></div>
+  `;
+  document.getElementById('uploadInput').addEventListener('change', handleUpload);
+
+  const { data } = await sb.from('activities').select('id,title').is('deleted_at', null);
+  activitiesCache = data || [];
+
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('list');
+  el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+  try {
+    const { data, error } = await sb.from('gallery').select('*').is('deleted_at', null).order('sort_order', { ascending: true });
+    if (error) throw error;
+    if (!data.length) { el.innerHTML = '<div class="state-box">لا توجد صور بعد.</div>'; return; }
+    el.innerHTML = `<div class="media-grid">${data.map(g => `
+      <div class="media-item" data-id="${g.id}">
+        <img src="${g.image_url}" alt="${esc(g.title || '')}" loading="lazy">
+        <div class="media-body">
+          <div style="font-size:.85rem; font-weight:700;">${esc(g.title || 'بدون عنوان')}</div>
+          <div style="font-size:.78rem; color:var(--muted);">${g.activity_id ? esc(activityTitle(g.activity_id)) : 'غير مرتبطة بنشاط'}</div>
+        </div>
+        <div class="media-actions">
+          <button class="btn btn-outline btn-sm" data-action="edit">تعديل</button>
+          <button class="btn btn-danger btn-sm" data-action="delete">حذف</button>
+        </div>
+      </div>`).join('')}</div>`;
+    el.querySelectorAll('[data-action="edit"]').forEach(b => b.onclick = () => openEdit(find(data, b)));
+    el.querySelectorAll('[data-action="delete"]').forEach(b => b.onclick = () => confirmDelete(find(data, b)));
+  } catch (err) {
+    notify.fromError(err, 'تعذر تحميل الصور');
+    el.innerHTML = '<div class="state-box">تعذر تحميل الصور.</div>';
+  }
+}
+
+function find(data, btn) { return data.find(x => x.id === btn.closest('.media-item').dataset.id); }
+function activityTitle(id) { return (activitiesCache.find(a => a.id === id) || {}).title || ''; }
+
+async function handleUpload(e) {
+  const files = Array.from(e.target.files || []);
+  if (!files.length) return;
+  const t = notify.loading(`جاري رفع ${files.length} صورة...`);
+  let success = 0, failed = 0;
+  for (const file of files) {
+    try {
+      const url = await uploadFile(file, 'gallery');
+      const { error } = await sb.from('gallery').insert({ image_url: url, title: file.name.replace(/\.[^.]+$/, ''), sort_order: 0 });
+      if (error) throw error;
+      success++;
+    } catch (err) {
+      failed++;
+      console.error(err);
+    }
+  }
+  t.remove();
+  e.target.value = '';
+  if (success) notify.success(`تم رفع ${success} صورة بنجاح`);
+  if (failed) notify.error(`تعذر رفع ${failed} صورة`);
+  await Auth.log('ADMIN_UPLOADED_GALLERY_IMAGES', 'gallery', null, `رفع ${success} صورة إلى المعرض`);
+  load();
+}
+
+function openEdit(g) {
+  openModal(`
+    <h3>تعديل الصورة</h3>
+    <img src="${g.image_url}" style="width:100%; border-radius:10px; margin-bottom:14px;">
+    <div class="form-group"><label>العنوان</label><input id="f_title" value="${attr(g.title)}"></div>
+    <div class="form-group"><label>الوصف</label><textarea id="f_desc">${g.description || ''}</textarea></div>
+    <div class="form-group"><label>ربط بنشاط</label>
+      <select id="f_activity">
+        <option value="">بدون ربط</option>
+        ${activitiesCache.map(a => `<option value="${a.id}" ${a.id === g.activity_id ? 'selected' : ''}>${esc(a.title)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="saveBtn">حفظ</button>
+      <button class="btn btn-outline" data-close>إلغاء</button>
+    </div>
+  `);
+  document.getElementById('saveBtn').onclick = async () => {
+    closeModal();
+    const t = notify.loading('جاري الحفظ...');
+    try {
+      const { error } = await sb.from('gallery').update({
+        title: document.getElementById('f_title').value.trim() || null,
+        description: document.getElementById('f_desc').value.trim() || null,
+        activity_id: document.getElementById('f_activity').value || null
+      }).eq('id', g.id);
+      if (error) throw error;
+      t.remove(); notify.success('تم الحفظ'); load();
+    } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحفظ'); }
+  };
+}
+
+function confirmDelete(g) {
+  openModal(`
+    <h3>حذف الصورة</h3>
+    <p>هل تريد حذف هذه الصورة من المعرض؟</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirmBtn">حذف</button>
+      <button class="btn btn-outline" data-close>إلغاء</button>
+    </div>`);
+  document.getElementById('confirmBtn').onclick = async () => {
+    closeModal();
+    const t = notify.loading('جاري الحذف...');
+    try {
+      const { error } = await sb.from('gallery').update({ deleted_at: new Date().toISOString() }).eq('id', g.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_DELETED_IMAGE', 'gallery', g.id, 'حذف صورة من المعرض');
+      t.remove(); notify.success('تم الحذف'); load();
+    } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحذف'); }
+  };
+}
+
+async function uploadFile(file, folder) {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  if (!allowed.includes(file.type)) throw new Error('نوع ملف غير مدعوم');
+  if (file.size > 5 * 1024 * 1024) throw new Error('حجم الملف أكبر من 5MB');
+  const path = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+  const { error } = await sb.storage.from('association-media').upload(path, file, { upsert: false });
+  if (error) throw error;
+  const { data } = sb.storage.from('association-media').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function attr(v) { return esc(v); }
+function openModal(html) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay'; overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal-box">${html}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.hasAttribute('data-close')) closeModal(); });
+}
+function closeModal() { const el = document.getElementById('modalOverlay'); if (el) el.remove(); }
+</script>
+</body>
+</html>

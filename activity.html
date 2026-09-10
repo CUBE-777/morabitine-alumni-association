@@ -631,25 +631,40 @@
             }
         };
 
-        function loadActivity() {
+        async function loadActivity() {
             const urlParams = new URLSearchParams(window.location.search);
             const activityId = urlParams.get('id') || 'annual-meeting';
 
-            fetch('content/activities.json')
-                .then(res => res.ok ? res.json() : null)
-                .then(data => {
-                    let activity = null;
-                    if (data && data.items) {
-                        activity = data.items.find(item => item.id === activityId);
-                    }
-                    if (!activity) {
-                        activity = defaultActivities[activityId] || defaultActivities["annual-meeting"];
-                    }
-                    renderActivity(activity);
-                })
-                .catch(() => {
+            try {
+                if (!window.sb) throw new Error('Supabase client غير متاح');
+                const { data, error } = await sb
+                    .from('activities')
+                    .select('slug, title, description, category, target_audience, date, time, location, cover_image_url, sub_activities')
+                    .eq('slug', activityId)
+                    .eq('status', 'published')
+                    .is('deleted_at', null)
+                    .maybeSingle();
+                if (error) throw error;
+
+                if (data) {
+                    renderActivity({
+                        title: data.title,
+                        date: data.date ? new Date(data.date).toLocaleDateString('ar-MA') : null,
+                        location: data.location,
+                        category: data.category,
+                        target: data.target_audience,
+                        image: data.cover_image_url,
+                        content: data.description,
+                        sub_activities: Array.isArray(data.sub_activities) ? data.sub_activities : []
+                    });
+                } else {
+                    // نشاط غير موجود في القاعدة بعد (أو لم يُنشر) — نعرض المحتوى الاحتياطي المعروف لهذا المعرّف إن وجد
                     renderActivity(defaultActivities[activityId] || defaultActivities["annual-meeting"]);
-                });
+                }
+            } catch (err) {
+                console.error('تعذر تحميل النشاط من قاعدة البيانات:', err);
+                renderActivity(defaultActivities[activityId] || defaultActivities["annual-meeting"]);
+            }
         }
 
         function renderActivity(item) {

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سجل العمليات — لوحة إدارة الجمعية</title>
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<style>
+  .toolbar { display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .toolbar input, .toolbar select { padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:.86rem; }
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script>
+const PAGE_SIZE = 20;
+let state = { page: 1, entity: '' };
+
+(async function init() {
+  const profile = await Auth.requireAuth(['super_admin']);
+  if (!profile) return;
+  const main = AdminLayout.render(profile, 'audit');
+  main.innerHTML = `
+    <div class="page-header"><div><h1>سجل العمليات الإدارية</h1><div class="page-subtitle">سجل كامل بكل العمليات الحساسة في لوحة الإدارة</div></div></div>
+    <div class="panel">
+      <div class="toolbar">
+        <select id="entityFilter">
+          <option value="">كل الأقسام</option>
+          <option value="members">الأعضاء</option>
+          <option value="membership_requests">طلبات الانخراط</option>
+          <option value="activities">الأنشطة</option>
+          <option value="gallery">المعرض</option>
+          <option value="site_content">محتوى الموقع</option>
+          <option value="site_settings">الإعدادات</option>
+        </select>
+      </div>
+      <div id="list" class="state-box">جاري التحميل...</div>
+      <div class="pagination" id="pagination" style="display:flex; gap:8px; justify-content:center; margin-top:16px;"></div>
+    </div>
+  `;
+  document.getElementById('entityFilter').addEventListener('change', (e) => { state.entity = e.target.value; state.page = 1; load(); });
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('list');
+  el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+  try {
+    let query = sb.from('audit_logs').select('*, profiles(full_name)', { count: 'exact' });
+    if (state.entity) query = query.eq('entity_type', state.entity);
+    const from = (state.page - 1) * PAGE_SIZE;
+    query = query.order('created_at', { ascending: false }).range(from, from + PAGE_SIZE - 1);
+
+    const { data, error, count } = await query;
+    if (error) throw error;
+    if (!data.length) { el.innerHTML = '<div class="state-box">لا توجد عمليات مسجّلة.</div>'; document.getElementById('pagination').innerHTML=''; return; }
+
+    el.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>المسؤول</th><th>العملية</th><th>الوصف</th><th>التاريخ</th></tr></thead>
+        <tbody>${data.map(a => `
+          <tr>
+            <td>${esc(a.profiles?.full_name || '—')}</td>
+            <td><code style="font-size:.8rem;">${esc(a.action)}</code></td>
+            <td>${esc(a.description || '—')}</td>
+            <td style="font-size:.82rem;">${new Date(a.created_at).toLocaleString('ar-MA')}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    renderPagination(count);
+  } catch (err) {
+    notify.fromError(err, 'تعذر تحميل السجل');
+    el.innerHTML = '<div class="state-box">تعذر التحميل.</div>';
+  }
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (pages <= 1) { el.innerHTML = ''; return; }
+  let html = '';
+  for (let i = 1; i <= pages; i++) html += `<button style="padding:6px 12px; border:1px solid var(--border); background:${i===state.page?'var(--gold)':'#fff'}; border-radius:6px; font-size:.85rem;" data-page="${i}">${i}</button>`;
+  el.innerHTML = html;
+  el.querySelectorAll('button').forEach(b => b.onclick = () => { state.page = parseInt(b.dataset.page, 10); load(); });
+}
+
+function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+</script>
+</body>
+</html>

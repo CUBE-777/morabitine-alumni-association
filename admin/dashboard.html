@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة القيادة — لوحة إدارة الجمعية</title>
+  <link rel="icon" href="../logo.jpg" type="image/jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../js/supabase.js"></script>
+  <script src="../js/notifications.js"></script>
+  <script src="../js/auth.js"></script>
+  <script src="../js/admin-layout.js"></script>
+
+  <script>
+    (async function init() {
+      const profile = await Auth.requireAuth();
+      if (!profile) return;
+
+      const main = AdminLayout.render(profile, 'dashboard');
+      main.innerHTML = `
+        <div class="page-header">
+          <div>
+            <h1>مرحبًا، ${profile.full_name.split(' ')[0]}</h1>
+            <div class="page-subtitle">نظرة سريعة على نشاط الجمعية اليوم</div>
+          </div>
+        </div>
+        <div class="stat-grid" id="statGrid">
+          ${Array(4).fill('<div class="stat-card"><div class="stat-label">...</div><div class="stat-value">–</div></div>').join('')}
+        </div>
+        <div class="panel">
+          <h2>آخر طلبات الانخراط</h2>
+          <div id="recentRequests" class="state-box">جاري التحميل...</div>
+        </div>
+        <div class="panel">
+          <h2>آخر العمليات الإدارية</h2>
+          <div id="recentAudit" class="state-box">جاري التحميل...</div>
+        </div>
+      `;
+
+      loadStats();
+      loadRecentRequests(profile);
+      loadRecentAudit(profile);
+    })();
+
+    async function loadStats() {
+      const grid = document.getElementById('statGrid');
+      try {
+        const [members, pending, activities, gallery] = await Promise.all([
+          sb.from('members').select('id', { count: 'exact', head: true }).is('deleted_at', null),
+          sb.from('membership_requests').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
+          sb.from('activities').select('id', { count: 'exact', head: true }).eq('status', 'published').is('deleted_at', null),
+          sb.from('gallery').select('id', { count: 'exact', head: true }).is('deleted_at', null)
+        ]);
+
+        const cards = [
+          ['إجمالي الأعضاء', members.count],
+          ['طلبات معلّقة', pending.count],
+          ['أنشطة منشورة', activities.count],
+          ['صور المعرض', gallery.count]
+        ];
+        grid.innerHTML = cards.map(([label, value]) => `
+          <div class="stat-card">
+            <div class="stat-label">${label}</div>
+            <div class="stat-value">${value ?? 0}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        notify.fromError(err, 'تعذر تحميل الإحصائيات');
+        grid.innerHTML = '<div class="state-box">تعذر تحميل الإحصائيات.</div>';
+      }
+    }
+
+    async function loadRecentRequests(profile) {
+      const el = document.getElementById('recentRequests');
+      if (!['super_admin', 'members_manager'].includes(profile.role)) {
+        el.innerHTML = '<div class="state-box">لا تملك صلاحية عرض هذا القسم.</div>';
+        return;
+      }
+      try {
+        const { data, error } = await sb
+          .from('membership_requests')
+          .select('id, full_name, email, status, created_at')
+          .order('created_at', { ascending: false })
+          .limit(5);
+        if (error) throw error;
+        if (!data.length) { el.innerHTML = '<div class="state-box">لا توجد طلبات بعد.</div>'; return; }
+        el.innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>الاسم</th><th>البريد</th><th>الحالة</th><th>التاريخ</th></tr></thead>
+            <tbody>
+              ${data.map(r => `
+                <tr>
+                  <td>${escapeHtml(r.full_name)}</td>
+                  <td>${escapeHtml(r.email)}</td>
+                  <td><span class="badge badge-${r.status}">${statusLabel(r.status)}</span></td>
+                  <td>${new Date(r.created_at).toLocaleDateString('ar-MA')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>`;
+      } catch (err) {
+        notify.fromError(err, 'تعذر تحميل الطلبات');
+        el.innerHTML = '<div class="state-box">تعذر تحميل الطلبات.</div>';
+      }
+    }
+
+    async function loadRecentAudit(profile) {
+      const el = document.getElementById('recentAudit');
+      if (profile.role !== 'super_admin') {
+        el.innerHTML = '<div class="state-box">لا تملك صلاحية عرض هذا القسم.</div>';
+        return;
+      }
+      try {
+        const { data, error } = await sb
+          .from('audit_logs')
+          .select('id, action, description, created_at')
+          .order('created_at', { ascending: false })
+          .limit(6);
+        if (error) throw error;
+        if (!data.length) { el.innerHTML = '<div class="state-box">لا توجد عمليات مسجّلة بعد.</div>'; return; }
+        el.innerHTML = `
+          <table class="data-table">
+            <thead><tr><th>العملية</th><th>الوصف</th><th>التاريخ</th></tr></thead>
+            <tbody>
+              ${data.map(a => `
+                <tr>
+                  <td>${escapeHtml(a.action)}</td>
+                  <td>${escapeHtml(a.description || '—')}</td>
+                  <td>${new Date(a.created_at).toLocaleString('ar-MA')}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>`;
+      } catch (err) {
+        notify.fromError(err, 'تعذر تحميل سجل العمليات');
+        el.innerHTML = '<div class="state-box">تعذر تحميل السجل.</div>';
+      }
+    }
+
+    function statusLabel(s) {
+      return { pending: 'قيد الانتظار', approved: 'مقبول', rejected: 'مرفوض' }[s] || s;
+    }
+    function escapeHtml(v) {
+      return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  </script>
+</body>
+</html>

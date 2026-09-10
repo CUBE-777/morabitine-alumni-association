@@ -1095,7 +1095,7 @@
         <h2>ما نقوم به على أرض الواقع</h2>
         <p>مجموعة من الأنشطة والمشاريع التي تجسد رسالة الجمعية، قابلة للتطور والإضافة مع نمو عمل الجمعية.</p>
       </div>
-      <div class="activity-grid">
+      <div class="activity-grid" id="activityGrid">
         <div class="activity-card">
           <div class="activity-icon">🤝</div>
           <h3>لقاء الخريجين السنوي</h3>
@@ -1121,6 +1121,7 @@
           <a href="activity.html?id=volunteer-initiatives" class="btn btn-ghost">عرض التفاصيل ←</a>
         </div>
       </div>
+      <!-- ملاحظة: البطاقات أعلاه هي محتوى احتياطي (fallback) يظهر فقط إذا لم توجد أنشطة منشورة بعد في قاعدة البيانات -->
     </div>
   </section>
 
@@ -1197,7 +1198,7 @@
             </div>
             <div class="full-row">
               <label for="m-track">الشعبة</label>
-              <select id="m-track" name="شعبة" required>
+              <select id="m-track" name="track" required>
                 <option value="" disabled selected>اختر شعبتك</option>
                 <option value="علوم تجريبية">علوم تجريبية</option>
                 <option value="علوم رياضية">علوم رياضية</option>
@@ -1302,6 +1303,7 @@
   <!-- Supabase Client (Phase 2: اتصال أساسي، لم يُستخدم بعد في عرض البيانات) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/supabase.js"></script>
+  <script src="js/notifications.js"></script>
 
   <script>
     const header = document.getElementById('site-header');
@@ -1314,21 +1316,93 @@
     navToggle.addEventListener('click', () => mainNav.classList.toggle('open'));
     mainNav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mainNav.classList.remove('open')));
 
-    // ===== Load gallery images from content/gallery.json (managed via /admin CMS) =====
-    fetch('content/gallery.json')
-      .then(res => res.ok ? res.json() : {items: []})
-      .then(data => {
-        const grid = document.getElementById('galleryGrid');
-        const items = (data && data.items) ? data.items : [];
-        if (!items.length) return; // keep the placeholder message
-        grid.innerHTML = items.map(item => `
+    // ===== إرسال نموذج طلب الانخراط مباشرة إلى Supabase (membership_requests) بدل Netlify Forms =====
+    (function () {
+      const form = document.getElementById('membershipForm');
+      if (!form) return;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // حماية بسيطة من الروبوتات: إن كان حقل bot-field-membership المخفي معبّأً، تجاهل الإرسال بصمت
+        const honeypot = form.querySelector('[name="bot-field-membership"]');
+        if (honeypot && honeypot.value) return;
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري الإرسال...';
+
+        const payload = {
+          full_name: form.querySelector('#m-name').value.trim(),
+          phone: form.querySelector('#m-phone').value.trim(),
+          email: form.querySelector('#m-email').value.trim(),
+          promotion: form.querySelector('#m-promo').value.trim() || null,
+          track: form.querySelector('#m-track').value || null,
+          message: form.querySelector('#m-message').value.trim() || null
+        };
+
+        try {
+          if (!window.sb) throw new Error('تعذر الاتصال بالخادم');
+          const { error } = await sb.from('membership_requests').insert(payload);
+          if (error) throw error;
+          window.location.href = 'thank-you.html';
+        } catch (err) {
+          console.error('تعذر إرسال طلب الانخراط:', err);
+          if (window.notify) notify.error('تعذر إرسال الطلب، تحقق من اتصالك بالإنترنت وحاول مرة أخرى.');
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      });
+    })();
+
+    // ===== Load published activities from Supabase (يحل مشكلة عدم ظهور الأنشطة الجديدة تلقائيًا) =====
+    (async () => {
+      const grid = document.getElementById('activityGrid');
+      try {
+        const { data, error } = await sb
+          .from('activities')
+          .select('slug, title, description, category')
+          .eq('status', 'published')
+          .is('deleted_at', null)
+          .order('date', { ascending: false })
+          .limit(8);
+        if (error) throw error;
+        if (!data || !data.length) return; // تبقى بطاقات fallback الأربع كما هي
+        const icons = ['🤝', '📚', '🎒', '🌱', '🎓', '🌟', '🏆', '🤲'];
+        grid.innerHTML = data.map((a, i) => `
+          <div class="activity-card">
+            <div class="activity-icon">${icons[i % icons.length]}</div>
+            <h3>${a.title}</h3>
+            <p>${(a.description || '').replace(/<[^>]*>/g, '').slice(0, 140)}</p>
+            <a href="activity.html?id=${encodeURIComponent(a.slug)}" class="btn btn-ghost">عرض التفاصيل ←</a>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('تعذر تحميل الأنشطة:', err); // تبقى بطاقات fallback كما هي
+      }
+    })();
+
+    // ===== Load gallery images from Supabase (بدل content/gallery.json) =====
+    (async () => {
+      const grid = document.getElementById('galleryGrid');
+      try {
+        const { data, error } = await sb
+          .from('gallery')
+          .select('image_url, title, description')
+          .is('deleted_at', null)
+          .order('sort_order', { ascending: true })
+          .limit(12);
+        if (error) throw error;
+        if (!data || !data.length) return; // يبقى نص العنصر النائب كما هو
+        grid.innerHTML = data.map(item => `
           <figure class="gallery-item">
-            <img src="${item.image}" alt="${item.caption || 'صورة من أنشطة الجمعية'}" loading="lazy">
-            ${item.caption ? `<figcaption>${item.caption}</figcaption>` : ''}
+            <img src="${item.image_url}" alt="${item.title || item.description || 'صورة من أنشطة الجمعية'}" loading="lazy">
+            ${item.title ? `<figcaption>${item.title}</figcaption>` : ''}
           </figure>
         `).join('');
-      })
-      .catch(() => { /* keep placeholder on error */});
+      } catch (err) {
+        console.error('تعذر تحميل صور المعرض:', err); // يبقى نص العنصر النائب كما هو
+      }
+    })();
   </script>
 
   <!-- Netlify Identity: needed so invite/confirmation email links redirect properly to the admin panel -->

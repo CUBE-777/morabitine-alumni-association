@@ -62,6 +62,60 @@ function matchesMemberSearch(person, query) {
   return searchableText.includes(query);
 }
 
+/**
+ * يحوّل صفًا من جدول "members" في Supabase إلى بنية person المستخدمة في memberCardHtml.
+ * (يحافظ على نفس أسماء الحقول المستخدمة سابقًا في content/members.json)
+ */
+function memberRowToPerson(row) {
+  return {
+    name: row.full_name,
+    role: 'عضو الجمعية',
+    university: row.university,
+    age: row.age,
+    promo: row.promotion,
+    track: row.track,
+    profession: row.profession,
+    image: row.photo_url
+  };
+}
+
+/**
+ * يحوّل صفًا من جدول "board_members" إلى نفس بنية person (نفس البطاقة والـ classes).
+ */
+function boardRowToPerson(row) {
+  return {
+    name: row.full_name,
+    role: row.position,
+    university: row.university,
+    age: null,
+    promo: null,
+    track: null,
+    profession: row.bio, // نعرض النبذة في مكان "المهنة/التخصص" حتى لا نضيف حقلاً جديدًا للبطاقة
+    image: row.photo_url
+  };
+}
+
+async function fetchPeopleFromSupabase(listKey) {
+  if (!window.sb) throw new Error('Supabase client غير متاح');
+  if (listKey === 'board') {
+    const { data, error } = await sb
+      .from('board_members')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (error) throw error;
+    return (data || []).map(boardRowToPerson);
+  }
+  const { data, error } = await sb
+    .from('members')
+    .select('*')
+    .eq('status', 'active')
+    .is('deleted_at', null)
+    .order('created_at', { ascending: false });
+  if (error) throw error;
+  return (data || []).map(memberRowToPerson);
+}
+
 function loadMembersPage(options) {
   const grid = document.getElementById(options.gridId);
   if (!grid) return;
@@ -69,10 +123,10 @@ function loadMembersPage(options) {
   const searchInput = document.getElementById(options.searchId);
   const countElement = document.getElementById(options.countId);
 
-  fetch('content/members.json')
-    .then(res => res.ok ? res.json() : { board: [], members: [] })
-    .then(data => {
-      const people = Array.isArray(data[options.listKey]) ? data[options.listKey] : [];
+  grid.innerHTML = '<div class="gallery-empty">جاري التحميل...</div>';
+
+  fetchPeopleFromSupabase(options.listKey)
+    .then(people => {
       if (!people.length) {
         grid.innerHTML = `<div class="gallery-empty">${options.emptyText}</div>`;
         return;
@@ -101,7 +155,8 @@ function loadMembersPage(options) {
       if (searchInput) searchInput.addEventListener('input', renderPeople);
       renderPeople();
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error('تعذر تحميل البيانات من Supabase:', err);
       grid.innerHTML = `<div class="gallery-empty">${options.emptyText}</div>`;
     });
 }
