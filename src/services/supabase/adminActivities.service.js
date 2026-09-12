@@ -1,0 +1,55 @@
+import { supabase } from './client';
+import { logAction } from './auth.service';
+
+export const STATUS_LABEL = { draft: 'مسودة', published: 'منشور', archived: 'مؤرشف' };
+
+export async function fetchActivitiesAdmin() {
+  const { data, error } = await supabase.from('activities').select('*').is('deleted_at', null).order('created_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+function slugify(title) {
+  return (
+    title
+      .trim()
+      .toLowerCase()
+      .replace(/[^\u0600-\u06FFa-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') +
+    '-' +
+    Date.now().toString(36)
+  );
+}
+
+export async function saveActivity(existing, payload) {
+  if (!existing) {
+    payload.slug = slugify(payload.title);
+    payload.status = 'draft';
+  }
+  if (existing) {
+    const { error } = await supabase.from('activities').update(payload).eq('id', existing.id);
+    if (error) throw error;
+    await logAction('ADMIN_UPDATED_ACTIVITY', 'activities', existing.id, `تعديل النشاط ${payload.title}`);
+  } else {
+    const { data, error } = await supabase.from('activities').insert(payload).select().single();
+    if (error) throw error;
+    await logAction('ADMIN_CREATED_ACTIVITY', 'activities', data.id, `إضافة نشاط جديد: ${payload.title}`);
+  }
+}
+
+export async function setActivityStatus(activity, status) {
+  const { error } = await supabase.from('activities').update({ status }).eq('id', activity.id);
+  if (error) throw error;
+  await logAction(
+    status === 'published' ? 'ADMIN_PUBLISHED_ACTIVITY' : 'ADMIN_ARCHIVED_ACTIVITY',
+    'activities',
+    activity.id,
+    `تغيير حالة النشاط ${activity.title} إلى ${STATUS_LABEL[status]}`
+  );
+}
+
+export async function softDeleteActivity(activity) {
+  const { error } = await supabase.from('activities').update({ deleted_at: new Date().toISOString() }).eq('id', activity.id);
+  if (error) throw error;
+  await logAction('ADMIN_DELETED_ACTIVITY', 'activities', activity.id, `حذف النشاط ${activity.title}`);
+}

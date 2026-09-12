@@ -1,0 +1,47 @@
+/**
+ * src/styles/tokens.css
+ * Design tokens موحّدة للموقع بالكامل — مستخرجة حرفيًا من :root في index.html
+ * و admin/admin.css الأصليين. أي تغيير لوني يجب أن يمرّ من هنا فقط، وليس
+ * بقيم CSS متفرقة داخل المكونات.
+ */
+
+:root {
+  /* ===== ألوان الموقع العام (كما هي، بدون أي تغيير) ===== */
+  --navy-deep: #081633;
+  --navy: #0f2657;
+  --navy-mid: #173a7d;
+  --gold: #f2a93b;
+  --gold-light: #ffd98a;
+  --cream: #f7f3ea;
+  --ink: #1a2238;
+  --white: #ffffff;
+  --muted: #5b6784;
+
+  /* ===== ألوان إضافية من admin.css (تُستخدم أيضًا في حالات الموقع العام: نجاح/خطأ) ===== */
+  --danger: #b3261e;
+  --success: #1f7a4d;
+  --border: #e9e3d5;
+
+  /* ===== قياسات عامة ===== */
+  --sidebar-w: 260px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --transition-base: 0.25s ease;
+}
+
+/* ===== لوحة الإدارة (Admin) — Dark-first، SaaS Control Center =====
+   موسّعة عمدًا عن admin.css الأصلي استعدادًا لإعادة تصميم لوحة الإدارة
+   (المرحلة 7 من خطة الترحيل)، ولا تُستخدم بعد في الموقع العام. */
+[data-theme='admin-dark'] {
+  --admin-bg: #060c1c;
+  --admin-surface: #0d1730;
+  --admin-surface-alt: #101d3d;
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-text: #e7ecfb;
+  --admin-text-muted: #8f9bc4;
+  --admin-accent: var(--gold);
+  --admin-accent-soft: rgba(242, 169, 59, 0.14);
+  --admin-glow: 0 0 0 1px rgba(242, 169, 59, 0.12), 0 12px 40px rgba(8, 22, 51, 0.55);
+}

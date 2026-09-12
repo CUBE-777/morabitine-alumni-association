@@ -8,7 +8,15 @@
 # لتفادي كسر تحميل الخطوط أو استدعاءات Supabase.
 
 [build]
-  publish = "."
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: React Router يتولى التوجيه داخل المتصفح، لذا كل المسارات غير
+# الموجودة كملفات فعلية يجب أن تُعاد توجيهها إلى index.html.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[headers]]
   for = "/*"

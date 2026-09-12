@@ -1,0 +1,53 @@
+import { createBrowserRouter } from 'react-router-dom';
+import Home from '../../pages/public/Home';
+import Members from '../../pages/public/Members';
+import Board from '../../pages/public/Board';
+import Activity from '../../pages/public/Activity';
+import ThankYou from '../../pages/public/ThankYou';
+import Login from '../../pages/admin/Login';
+import Dashboard from '../../pages/admin/Dashboard';
+import Requests from '../../pages/admin/Requests';
+import AdminMembers from '../../pages/admin/Members';
+import AdminBoard from '../../pages/admin/Board';
+import Activities from '../../pages/admin/Activities';
+import Gallery from '../../pages/admin/Gallery';
+import Announcements from '../../pages/admin/Announcements';
+import Content from '../../pages/admin/Content';
+import AdminUsers from '../../pages/admin/AdminUsers';
+import Audit from '../../pages/admin/Audit';
+import Settings from '../../pages/admin/Settings';
+import ProtectedRoute from '../../components/admin/ProtectedRoute';
+
+/**
+ * src/app/router/index.jsx
+ * راوتر الموقع العام (Phase 5، مكتمل) + راوتر لوحة الإدارة (Phase 6–7، مكتمل).
+ * كل مسار /admin/* محمي بـ ProtectedRoute (يطابق سلوك Auth.requireAuth(roles)
+ * الأصلي).
+ * ملاحظة: activity.html?id=slug أصبحت /activity/:slug (مسار نظيف بدل query
+ * string) — سلوك مطابق وظيفيًا، وأفضل لـ SEO والمشاركة.
+ */
+function protectedAdmin(roles, element) {
+  return <ProtectedRoute roles={roles}>{element}</ProtectedRoute>;
+}
+
+export const router = createBrowserRouter([
+  { path: '/', element: <Home /> },
+  { path: '/members', element: <Members /> },
+  { path: '/board', element: <Board /> },
+  { path: '/activity/:slug', element: <Activity /> },
+  { path: '/thank-you', element: <ThankYou /> },
+
+  { path: '/admin/login', element: <Login /> },
+  { path: '/admin/dashboard', element: protectedAdmin([], <Dashboard />) },
+  { path: '/admin/members', element: protectedAdmin(['super_admin', 'members_manager'], <AdminMembers />) },
+  { path: '/admin/requests', element: protectedAdmin(['super_admin', 'members_manager'], <Requests />) },
+  { path: '/admin/board', element: protectedAdmin(['super_admin', 'editor'], <AdminBoard />) },
+  { path: '/admin/activities', element: protectedAdmin(['super_admin', 'editor'], <Activities />) },
+  { path: '/admin/gallery', element: protectedAdmin(['super_admin', 'editor'], <Gallery />) },
+  { path: '/admin/announcements', element: protectedAdmin(['super_admin', 'editor'], <Announcements />) },
+  { path: '/admin/content', element: protectedAdmin(['super_admin', 'editor'], <Content />) },
+  { path: '/admin/admins', element: protectedAdmin(['super_admin'], <AdminUsers />) },
+  { path: '/admin/audit', element: protectedAdmin(['super_admin'], <Audit />) },
+  { path: '/admin/settings', element: protectedAdmin(['super_admin'], <Settings />) },
+]);
+
