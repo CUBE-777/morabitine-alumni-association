@@ -65,10 +65,7 @@
 
     /* ===== HEADER ===== */
     header {
-      position: fixed;
-      top: 0;
-      right: 0;
-      left: 0;
+      position: static;
       z-index: 100;
       padding: 16px 0;
       transition: background .35s ease, box-shadow .35s ease, padding .35s ease;
@@ -149,6 +146,19 @@
     }
 
     /* ===== HERO ===== */
+    /* ===== الحاوية المثبّتة لشريط الإعلانات + الهيدر معًا (جديد) =====
+       هذا يحل مشكلة كان الهيدر (position:fixed مباشرة) يُخفي شريط الإعلانات
+       خلفه، لأن كلا العنصرين كانا يتنافسان على نفس أعلى الصفحة. الآن يُثبَّت
+       العنصران معًا كوحدة واحدة، ويُقاس ارتفاعهما الفعلي في JS
+       (--fixed-stack-height) لدفع محتوى Hero بنفس المقدار بالضبط. */
+    .fixed-top-stack {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 100;
+    }
+
     .hero {
       position: relative;
       min-height: 100vh;
@@ -156,7 +166,7 @@
       align-items: center;
       background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 45%, var(--navy-deep) 100%);
       overflow: hidden;
-      padding-top: 100px;
+      padding-top: var(--fixed-stack-height, 100px);
     }
 
     .hero-arc {
@@ -816,7 +826,7 @@
       }
 
       .hero {
-        padding-top: 110px;
+        padding-top: calc(var(--fixed-stack-height, 100px) + 10px);
       }
     }
 
@@ -972,31 +982,71 @@
   line-height: 1;
 }
 
-/* ===== Language switcher (جديد — لم يكن موجودًا في المشروع الأصلي، يخدم i18n) ===== */
+/* ===== Language switcher (جديد — لم يكن موجودًا في المشروع الأصلي، يخدم i18n) =====
+   إعادة تصميم بطلب المستخدم: يظهر فقط رمز اللغة الحالية + سهم، وقائمة منسدلة
+   لباقي اللغات عند الضغط، بدل عرض كل الأزرار جنبًا إلى جنب. */
 .lang-switcher {
-  display: flex;
-  gap: 6px;
+  position: relative;
   margin-inline-start: 18px;
 }
 
-.lang-switcher-btn {
+.lang-switcher-current {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   background: transparent;
   border: 1px solid rgba(255, 255, 255, 0.35);
   color: var(--white);
   border-radius: 6px;
-  padding: 4px 9px;
-  font-size: 0.75rem;
+  padding: 6px 10px;
+  font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
   transition: background var(--transition-base);
 }
 
-.lang-switcher-btn:hover {
+.lang-switcher-current:hover {
   background: rgba(255, 255, 255, 0.12);
 }
 
-.lang-switcher-btn.active {
-  background: var(--gold);
-  color: var(--navy-deep);
-  border-color: var(--gold);
+.lang-switcher-arrow {
+  font-size: 0.7rem;
+  transition: transform var(--transition-base);
+}
+
+.lang-switcher-arrow.open {
+  transform: rotate(180deg);
+}
+
+.lang-switcher-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  inset-inline-end: 0;
+  background: var(--navy-deep);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  min-width: 130px;
+  list-style: none;
+  margin: 0;
+  padding: 6px;
+  z-index: 200;
+}
+
+.lang-switcher-menu li button {
+  width: 100%;
+  text-align: start;
+  background: none;
+  border: none;
+  color: var(--white);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: 'Tajawal', sans-serif;
+}
+
+.lang-switcher-menu li button:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
