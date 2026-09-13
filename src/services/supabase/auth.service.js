@@ -33,7 +33,11 @@ export async function getProfile() {
 export async function logAction(action, entityType, entityId, description, metadata) {
   const session = await getSession();
   if (!session) return;
-  await supabase.from('audit_logs').insert({
+  // ملاحظة: كانت هذه الدالة تتجاهل أي خطأ بصمت (لا throw ولا تسجيل)، فإذا فشل
+  // إدخال سجل التدقيق (مثلاً بسبب سياسة RLS) لا تظهر أي إشارة لذلك، رغم أن
+  // العملية الأصلية (إضافة/تعديل/حذف) تكون قد نجحت فعلاً. أُضيف تسجيل صريح
+  // للخطأ في الـ console حتى يمكن تشخيصه، دون أن يمنع نجاح العملية الأساسية.
+  const { error } = await supabase.from('audit_logs').insert({
     user_id: session.user.id,
     action,
     entity_type: entityType,
@@ -41,6 +45,9 @@ export async function logAction(action, entityType, entityId, description, metad
     description: description || null,
     metadata: metadata || null,
   });
+  if (error) {
+    console.error('تعذر تسجيل العملية في سجل التدقيق (audit_logs):', error);
+  }
 }
 
 export const ROLE_LABELS = {

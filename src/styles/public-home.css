@@ -390,10 +390,11 @@
     }
 
     .activity-card {
-      background: rgba(255, 255, 255, .04);
-      border: 1px solid rgba(255, 255, 255, .08);
+      background: rgba(255, 255, 255, .07);
+      border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 16px;
       padding: 32px 28px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .25);
       transition: transform .3s ease, background .3s ease, border-color .3s ease;
     }
 
