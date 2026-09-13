@@ -1,33 +1,24 @@
-/* ===== المتغيرات العامة (الجذر) ===== */
+/* ==========================================================================
+   CSS VARIABLES (التحكم في الطبقات والانتقالات)
+   ========================================================================== */
 :root {
-  /* الألوان الأساسية */
-  --navy-deep: #081633;
-  --navy: #0f2759;
-  --navy-mid: #173a7d;
-  --gold: #f2a93b;
-  --gold-light: #ffd98a;
-  --cream: #f9f7f1;
-  --white: #ffffff;
-  --ink: #1a1a1a;
-  --muted: #5b6784;
-
-  /* المسافات والأبعاد */
-  --container-max: 1200px;
-  --container-pad: 24px;
-  --section-pad-y: 80px;
-  --section-pad-y-mobile: 50px;
-  --transition-base: 0.3s ease;
-
-  /* نظام الطبقات (Z-Index Scale) */
-  --z-base: 10;
+  /* Z-Index Hierarchy */
+  --z-behind: -1;
+  --z-normal: 1;
   --z-announcement: 60;
+  --z-nav-mobile: 90;
   --z-header: 100;
   --z-dropdown: 200;
-  --z-overlay: 990;
   --z-modal: 1000;
-  --z-modal-content: 1010;
+  --z-modal-ui: 1010;
+
+  /* Transitions */
+  --transition-base: 0.3s ease;
 }
 
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -36,6 +27,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* مسافة أمان لمنع اختفاء عناوين الأقسام خلف الهيدر الثابت */
+  scroll-padding-top: calc(var(--fixed-stack-height, 110px) + 20px);
 }
 
 body {
@@ -93,12 +86,22 @@ img {
   display: inline-block;
 }
 
-/* ===== ANNOUNCEMENT BAR ===== */
+/* ==========================================================================
+   ANNOUNCEMENT BAR & FIXED STACK
+   ========================================================================== */
+.fixed-top-stack {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: var(--z-header);
+}
+
 .announcement-bar {
   position: relative;
   z-index: var(--z-announcement);
-  background: linear-gradient(90deg, var(--navy-mid), var(--navy-deep));
-  color: var(--white);
+  background: linear-gradient(90deg, #173a7d, #081633);
+  color: #fff;
   text-align: center;
   padding: 10px 44px;
   font-size: 0.88rem;
@@ -114,42 +117,46 @@ img {
 
 .announcement-bar-close {
   position: absolute;
-  inset-inline-start: 12px;
-  /* دعم RTL/LTR */
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
-  color: var(--white);
+  color: #fff;
   font-size: 1.3rem;
   cursor: pointer;
   line-height: 1;
 }
 
-/* ===== HEADER ===== */
-.fixed-top-stack {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: var(--z-header);
+[dir="ltr"] .announcement-bar-close {
+  left: auto;
+  right: 12px;
 }
 
+/* ==========================================================================
+   HEADER & NAVIGATION
+   ========================================================================== */
 header {
   position: static;
   padding: 16px 0;
   background: transparent;
+  /* شفافية في أعلى الصفحة للاندماج مع الخلفية */
   transition: background var(--transition-base), box-shadow var(--transition-base), padding var(--transition-base);
 }
 
+/* حالة الهيدر عند النزول (Scrolled) - لون داكن كبديل للأجهزة الضعيفة */
 header.scrolled {
-  background: var(--navy-deep);
-  /* بديل آمن للأجهزة الضعيفة */
-  background: rgba(8, 22, 51, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(8, 22, 51, 0.98);
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
   padding: 10px 0;
+}
+
+/* تفعيل التمويه (Blur) فقط للمتصفحات الحديثة التي تدعمه */
+@supports (backdrop-filter: blur(8px)) {
+  header.scrolled {
+    background: rgba(8, 22, 51, 0.92);
+    backdrop-filter: blur(8px);
+  }
 }
 
 header .container {
@@ -204,7 +211,7 @@ nav a::after {
   content: "";
   position: absolute;
   bottom: 0;
-  inset-inline-end: 0;
+  right: 0;
   width: 0%;
   height: 2px;
   background: var(--gold);
@@ -219,7 +226,9 @@ nav a:hover::after {
   display: none;
 }
 
-/* ===== LANGUAGE SWITCHER ===== */
+/* ==========================================================================
+   LANGUAGE SWITCHER
+   ========================================================================== */
 .lang-switcher {
   position: relative;
   margin-inline-start: 18px;
@@ -263,14 +272,10 @@ nav a:hover::after {
   border-radius: 8px;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   min-width: 130px;
+  list-style: none;
+  margin: 0;
   padding: 6px;
   z-index: var(--z-dropdown);
-  display: none;
-  /* إخفاء افتراضي، يتم التحكم به عبر JS */
-}
-
-.lang-switcher-menu.active {
-  display: block;
 }
 
 .lang-switcher-menu li button {
@@ -284,13 +289,16 @@ nav a:hover::after {
   font-size: 0.82rem;
   cursor: pointer;
   font-family: 'Tajawal', sans-serif;
+  transition: background var(--transition-base);
 }
 
 .lang-switcher-menu li button:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* ===== HERO ===== */
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -336,7 +344,7 @@ nav a:hover::after {
 
 .hero .container {
   position: relative;
-  z-index: var(--z-base);
+  z-index: var(--z-normal);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -393,7 +401,6 @@ nav a:hover::after {
   font-size: 0.98rem;
   transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
   border: 1px solid transparent;
-  cursor: pointer;
 }
 
 .btn-gold {
@@ -418,7 +425,7 @@ nav a:hover::after {
   transform: translateY(-3px);
 }
 
-/* ===== DIVIDER ===== */
+/* DIVIDER (signature arc) */
 .arc-divider {
   display: block;
   width: 100%;
@@ -426,7 +433,9 @@ nav a:hover::after {
   margin-top: -1px;
 }
 
-/* ===== SECTION GENERIC ===== */
+/* ==========================================================================
+   GENERAL SECTIONS
+   ========================================================================== */
 section {
   padding: var(--section-pad-y) 0;
   position: relative;
@@ -469,7 +478,7 @@ section {
   background: var(--gold-light);
 }
 
-/* ===== ABOUT ===== */
+/* ABOUT SECTION */
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -498,6 +507,7 @@ section {
   border: 1px solid #e9e3d5;
   border-radius: 14px;
   padding: 26px 22px;
+  position: relative;
 }
 
 .pillar-num {
@@ -519,7 +529,9 @@ section {
   font-size: 0.92rem;
 }
 
-/* ===== ACTIVITIES ===== */
+/* ==========================================================================
+   ACTIVITIES SECTION
+   ========================================================================== */
 .activities {
   background: var(--navy-deep);
 }
@@ -537,11 +549,21 @@ section {
   padding: 32px 28px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
   transition: transform var(--transition-base), background var(--transition-base), border-color var(--transition-base);
+
+  /* Flexbox للحفاظ على توازن الأزرار في الأسفل */
+  display: flex;
+  flex-direction: column;
 }
 
 .activity-card:hover {
   transform: translateY(-6px);
+  background: rgba(255, 255, 255, 0.07);
   border-color: rgba(242, 169, 59, 0.4);
+}
+
+/* دفع العنصر الأخير (الرابط) إلى أسفل البطاقة دائماً */
+.activity-card>*:last-child {
+  margin-top: auto;
 }
 
 .activity-icon {
@@ -566,70 +588,16 @@ section {
 .activity-card p {
   color: #aab6d6;
   font-size: 0.95rem;
+  margin-bottom: 20px;
+  /* إضافة مسافة بين النص والرابط */
 }
 
-/* ===== GALLERY ===== */
-.gallery {
-  background: var(--cream);
-}
-
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-}
-
-.gallery-item {
-  position: relative;
-  border-radius: 14px;
-  overflow: hidden;
-  aspect-ratio: 4 / 3;
-  background: #e9e3d5;
-}
-
-/* دمج محددات الصور القابلة للنقر */
-.gallery-item img,
-[id^="gallery"] img,
-.gallery-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.4s ease;
-}
-
-.gallery-item:hover img,
-[id^="gallery"] img:hover,
-.gallery-card img:hover {
-  transform: scale(1.06);
-}
-
-.gallery-item figcaption {
-  position: absolute;
-  inset: auto 0 0 0;
-  background: linear-gradient(to top, rgba(8, 22, 51, 0.85), transparent);
-  color: var(--white);
-  font-size: 0.85rem;
-  padding: 26px 14px 10px;
-}
-
-.gallery-empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  color: var(--muted);
-  padding: 40px 20px;
-  border: 1px dashed #d8cfb8;
-  border-radius: 14px;
-  font-size: 0.95rem;
-}
-
-/* ===== MEMBERS ===== */
+/* MEMBERS & JOIN */
 .members-section,
 .join {
   background: var(--cream);
 }
 
-/* ===== JOIN / DONATE ===== */
 .join-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -651,23 +619,26 @@ section {
   border: none;
 }
 
-.join-card h3 {
-  font-size: 1.5rem;
-  margin-bottom: 14px;
+.join-card.featured h3 {
+  color: var(--white);
+}
+
+.join-card:not(.featured) h3 {
   color: var(--navy-deep);
 }
 
-.join-card.featured h3 {
-  color: var(--white);
+.join-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 14px;
+}
+
+.join-card.featured p {
+  color: #c9d3ea;
 }
 
 .join-card p {
   color: var(--muted);
   margin-bottom: 24px;
-}
-
-.join-card.featured p {
-  color: #c9d3ea;
 }
 
 .join-list {
@@ -689,7 +660,183 @@ section {
   margin-top: 6px;
 }
 
-/* ===== CONTACT ===== */
+/* ==========================================================================
+   GALLERY & LIGHTBOX
+   ========================================================================== */
+.gallery {
+  background: var(--cream);
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: #e9e3d5;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.06);
+}
+
+.gallery-item figcaption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(8, 22, 51, 0.85), transparent);
+  color: var(--white);
+  font-size: 0.85rem;
+  padding: 26px 14px 10px;
+}
+
+.gallery-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 20px;
+  border: 1px dashed #d8cfb8;
+  border-radius: 14px;
+  font-size: 0.95rem;
+}
+
+/* تجميع محددات الصور القابلة للنقر */
+#gallery img,
+.gallery-card img,
+.gallery-grid img {
+  cursor: pointer;
+  transition: transform var(--transition-base);
+}
+
+#gallery img:hover,
+.gallery-card img:hover,
+.gallery-grid img:hover {
+  transform: scale(1.02);
+}
+
+/* Lightbox Modal */
+.lightbox-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(8, 22, 51, 0.98);
+  z-index: var(--z-modal);
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+
+@supports (backdrop-filter: blur(8px)) {
+  .lightbox-modal {
+    background: rgba(8, 22, 51, 0.94);
+    backdrop-filter: blur(8px);
+  }
+}
+
+.lightbox-modal.active {
+  display: flex;
+  opacity: 1;
+}
+
+.lightbox-content {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  object-fit: contain;
+  border: 2px solid rgba(242, 169, 59, 0.3);
+}
+
+.lightbox-caption {
+  position: absolute;
+  bottom: 24px;
+  color: #ffffff;
+  font-family: 'Tajawal', sans-serif;
+  font-size: 0.95rem;
+  background: rgba(0, 0, 0, 0.65);
+  padding: 8px 20px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 80%;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 20px;
+  left: 24px;
+  color: var(--gold, #f2a93b);
+  font-size: 2.4rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  line-height: 1;
+  transition: transform 0.2s;
+  z-index: var(--z-modal-ui);
+}
+
+[dir="ltr"] .lightbox-close {
+  left: auto;
+  right: 24px;
+}
+
+.lightbox-close:hover {
+  transform: scale(1.15);
+}
+
+.lightbox-prev,
+.lightbox-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.4rem;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  z-index: var(--z-modal-ui);
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+  background: var(--gold, #f2a93b);
+  color: var(--navy-deep, #081633);
+}
+
+.lightbox-prev {
+  right: 24px;
+}
+
+.lightbox-next {
+  left: 24px;
+}
+
+/* ==========================================================================
+   CONTACT FORM & FOOTER
+   ========================================================================== */
 .contact {
   background: var(--navy-deep);
   color: var(--white);
@@ -747,7 +894,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
   font-size: 0.95rem;
 }
 
@@ -792,28 +939,6 @@ form select {
   font-size: 0.95rem;
 }
 
-/* دعم اتجاهات القائمة المنسدلة بناءً على اللغة */
-form select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffd98a' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-}
-
-[dir="rtl"] form select {
-  background-position: left 14px center;
-  padding-left: 34px;
-}
-
-[dir="ltr"] form select {
-  background-position: right 14px center;
-  padding-right: 34px;
-}
-
-form select option {
-  background: var(--navy-deep);
-  color: var(--white);
-}
-
 form input::placeholder,
 form textarea::placeholder {
   color: #7c88a8;
@@ -822,6 +947,31 @@ form textarea::placeholder {
 form textarea {
   resize: vertical;
   min-height: 110px;
+}
+
+/* حل مشكلة سهم الـ Select ليدعم اللغتين العربية والإنجليزية بشكل ديناميكي */
+form select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23ffd98a' d='M6 8 0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+}
+
+form select,
+[dir="rtl"] form select {
+  background-position: left 14px center;
+  padding-left: 34px;
+  padding-right: 14px;
+}
+
+[dir="ltr"] form select {
+  background-position: right 14px center;
+  padding-right: 34px;
+  padding-left: 14px;
+}
+
+form select option {
+  background: var(--navy-deep);
+  color: var(--white);
 }
 
 .full-row {
@@ -833,6 +983,7 @@ form .btn-gold {
   width: 100%;
   justify-content: center;
   border: none;
+  cursor: pointer;
   margin-top: 6px;
 }
 
@@ -843,7 +994,6 @@ form .btn-gold {
   text-align: center;
 }
 
-/* ===== FOOTER ===== */
 footer {
   background: var(--navy-deep);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -856,6 +1006,10 @@ footer .container {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+footer .brand-text {
+  font-size: 0.95rem;
 }
 
 .foot-links {
@@ -880,106 +1034,14 @@ footer .container {
   margin-top: 24px;
 }
 
-/* ===== LIGHTBOX MODAL ===== */
-.lightbox-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(8, 22, 51, 0.98);
-  /* تم الاستغناء عن backdrop-filter للأداء */
-  z-index: var(--z-modal);
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.lightbox-modal.active {
-  display: flex;
-  opacity: 1;
-}
-
-.lightbox-content {
-  max-width: 90%;
-  max-height: 80vh;
-  border-radius: 12px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-  object-fit: contain;
-  border: 2px solid rgba(242, 169, 59, 0.3);
-  z-index: var(--z-modal-content);
-}
-
-.lightbox-caption {
-  position: absolute;
-  bottom: 24px;
-  color: #ffffff;
-  font-size: 0.95rem;
-  background: rgba(0, 0, 0, 0.65);
-  padding: 8px 20px;
-  border-radius: 20px;
-  text-align: center;
-  max-width: 80%;
-  z-index: var(--z-modal-content);
-}
-
-.lightbox-close {
-  position: absolute;
-  top: 20px;
-  inset-inline-start: 24px;
-  color: var(--gold);
-  font-size: 2.4rem;
-  cursor: pointer;
-  background: none;
-  border: none;
-  line-height: 1;
-  transition: transform 0.2s;
-  z-index: var(--z-modal-content);
-}
-
-.lightbox-close:hover {
-  transform: scale(1.15);
-}
-
-.lightbox-prev,
-.lightbox-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.12);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 1.4rem;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.25s ease;
-  z-index: var(--z-modal-content);
-}
-
-.lightbox-prev:hover,
-.lightbox-next:hover {
-  background: var(--gold);
-  color: var(--navy-deep);
-}
-
-.lightbox-prev {
-  inset-inline-end: 24px;
-}
-
-.lightbox-next {
-  inset-inline-start: 24px;
-}
-
-/* ===== RESPONSIVE ===== */
+/* ==========================================================================
+   RESPONSIVE (MEDIA QUERIES)
+   ========================================================================== */
 @media (max-width: 860px) {
   nav {
     position: fixed;
     top: 0;
-    inset-inline-end: 0;
+    right: 0;
     bottom: 0;
     width: 78%;
     max-width: 320px;
@@ -987,18 +1049,16 @@ footer .container {
     transform: translateX(100%);
     transition: transform 0.35s ease;
     padding: 100px 32px 32px;
-    z-index: var(--z-overlay);
+    z-index: var(--z-nav-mobile);
   }
 
   [dir="ltr"] nav {
+    left: 0;
+    right: auto;
     transform: translateX(-100%);
   }
 
   nav.open {
-    transform: translateX(0);
-  }
-
-  [dir="ltr"] nav.open {
     transform: translateX(0);
   }
 
@@ -1014,7 +1074,7 @@ footer .container {
     background: none;
     border: none;
     cursor: pointer;
-    z-index: var(--z-modal);
+    z-index: var(--z-header);
     padding: 6px;
   }
 
@@ -1030,8 +1090,7 @@ footer .container {
   .join-grid,
   .activity-grid,
   .pillars,
-  .form-row,
-  .gallery-grid {
+  .form-row {
     grid-template-columns: 1fr;
   }
 
@@ -1064,10 +1123,6 @@ footer .container {
 
   .hero-actions .btn {
     justify-content: center;
-  }
-
-  .gallery-grid {
-    grid-template-columns: 1fr;
   }
 }
 
