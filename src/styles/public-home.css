@@ -39,9 +39,9 @@
     }
 
     .container {
-      max-width: 1140px;
+      max-width: var(--container-max);
       margin: 0 auto;
-      padding: 0 28px;
+      padding: 0 var(--container-pad);
     }
 
     .eyebrow {
@@ -210,7 +210,6 @@
       flex-direction: column;
       align-items: center;
       gap: 24px;
-      padding-bottom: 120px;
     }
 
     .hero-badge {
@@ -296,7 +295,7 @@
 
     /* ===== SECTION generic ===== */
     section {
-      padding: 100px 0;
+      padding: var(--section-pad-y) 0;
       position: relative;
     }
 
@@ -822,11 +821,32 @@
       }
 
       section {
-        padding: 70px 0;
+        padding: var(--section-pad-y-mobile) 0;
       }
 
       .hero {
         padding-top: calc(var(--fixed-stack-height, 100px) + 10px);
+      }
+    }
+
+    /* نقطة كسر إضافية للهواتف الصغيرة جدًا (320–480px)، جزء من نظام التباعد
+       الموحّد (Phase 6) — لا تُستخدم أي حيل موضعية (transform/margin سالب). */
+    @media (max-width: 480px) {
+      .container {
+        padding: 0 18px;
+      }
+
+      .activity-card {
+        padding: 24px 20px;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .hero-actions .btn {
+        justify-content: center;
       }
     }
 

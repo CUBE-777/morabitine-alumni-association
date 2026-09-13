@@ -29,6 +29,16 @@
   --radius-lg: 16px;
   --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.12);
   --transition-base: 0.25s ease;
+
+  /* ===== نظام تباعد موحّد للموقع العام (Phase 2 — طبّق بدل القيم المبعثرة) =====
+     container/section/gap تستخدم هذه القيم بدل تكرار أرقام عشوائية في كل قسم. */
+  --container-max: 1140px;
+  --container-pad: 28px;
+  --section-pad-y: 100px;
+  --section-pad-y-mobile: 70px;
+  --gap-lg: 60px;
+  --gap-md: 24px;
+  --gap-sm: 18px;
 }
 
 /* ===== لوحة الإدارة (Admin) — Dark-first، SaaS Control Center =====
