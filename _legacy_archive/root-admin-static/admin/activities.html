@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>الأنشطة — لوحة إدارة الجمعية</title>
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script>
+(async function init() {
+  const profile = await Auth.requireAuth(['super_admin', 'editor']);
+  if (!profile) return;
+  const main = AdminLayout.render(profile, 'activities');
+  main.innerHTML = `
+    <div class="page-header">
+      <div><h1>الأنشطة</h1><div class="page-subtitle">إدارة أنشطة الجمعية ونشرها في الموقع</div></div>
+      <button class="btn btn-primary" id="addBtn">+ إضافة نشاط</button>
+    </div>
+    <div class="panel"><div id="list" class="state-box">جاري التحميل...</div></div>
+  `;
+  document.getElementById('addBtn').addEventListener('click', () => openForm(null));
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('list');
+  el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+  try {
+    const { data, error } = await sb.from('activities').select('*').is('deleted_at', null).order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data.length) { el.innerHTML = '<div class="state-box">لا توجد أنشطة بعد.</div>'; return; }
+    el.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>العنوان</th><th>الفئة</th><th>التاريخ</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>${data.map(a => `
+          <tr data-id="${a.id}">
+            <td>${esc(a.title)}</td>
+            <td>${esc(a.category || '—')}</td>
+            <td>${a.date ? new Date(a.date).toLocaleDateString('ar-MA') : '—'}</td>
+            <td><span class="badge badge-${a.status}">${statusLabel(a.status)}</span></td>
+            <td style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" data-action="edit">تعديل</button>
+              ${a.status !== 'published' ? `<button class="btn btn-primary btn-sm" data-action="publish">نشر</button>` : `<button class="btn btn-outline btn-sm" data-action="archive">أرشفة</button>`}
+              <button class="btn btn-danger btn-sm" data-action="delete">حذف</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    el.querySelectorAll('[data-action="edit"]').forEach(b => b.onclick = () => openForm(find(data, b)));
+    el.querySelectorAll('[data-action="publish"]').forEach(b => b.onclick = () => setStatus(find(data, b), 'published'));
+    el.querySelectorAll('[data-action="archive"]').forEach(b => b.onclick = () => setStatus(find(data, b), 'archived'));
+    el.querySelectorAll('[data-action="delete"]').forEach(b => b.onclick = () => confirmDelete(find(data, b)));
+  } catch (err) {
+    notify.fromError(err, 'تعذر تحميل الأنشطة');
+    el.innerHTML = '<div class="state-box">تعذر تحميل الأنشطة.</div>';
+  }
+}
+
+function find(data, btn) { return data.find(x => x.id === btn.closest('tr').dataset.id); }
+function statusLabel(s) { return { draft: 'مسودة', published: 'منشور', archived: 'مؤرشف' }[s] || s; }
+
+function openForm(a) {
+  const isEdit = !!a;
+  openModal(`
+    <h3>${isEdit ? 'تعديل نشاط' : 'إضافة نشاط جديد'}</h3>
+    <form id="actForm">
+      <div class="form-group"><label>العنوان *</label><input required id="f_title" value="${attr(a?.title)}"></div>
+      <div class="form-row-2">
+        <div class="form-group"><label>الفئة</label><input id="f_category" value="${attr(a?.category)}"></div>
+        <div class="form-group"><label>الفئة المستهدفة</label><input id="f_target" value="${attr(a?.target_audience)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>التاريخ</label><input type="date" id="f_date" value="${a?.date || ''}"></div>
+        <div class="form-group"><label>الوقت</label><input id="f_time" value="${attr(a?.time)}"></div>
+      </div>
+      <div class="form-group"><label>المكان</label><input id="f_location" value="${attr(a?.location)}"></div>
+      <div class="form-group"><label>صورة الغلاف</label><input type="file" id="f_image" accept="image/*">
+        ${a?.cover_image_url ? `<div style="font-size:.8rem;color:var(--muted);margin-top:4px;">صورة حالية موجودة، اختر ملفًا جديدًا فقط لاستبدالها.</div>` : ''}
+      </div>
+      <div class="form-group"><label>الوصف</label><textarea id="f_description" style="min-height:140px;">${esc(a?.description || '')}</textarea></div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">${isEdit ? 'حفظ التعديلات' : 'حفظ كمسودة'}</button>
+        <button type="button" class="btn btn-outline" data-close>إلغاء</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('actForm').onsubmit = (e) => { e.preventDefault(); save(a); };
+}
+
+async function save(existing) {
+  const title = val('f_title');
+  if (!title) { notify.error('العنوان مطلوب'); return; }
+
+  closeModal();
+  const t = notify.loading('جاري الحفظ...');
+  try {
+    let coverUrl = existing?.cover_image_url || null;
+    const fileInput = document.getElementById('f_image');
+    if (fileInput && fileInput.files[0]) {
+      coverUrl = await uploadFile(fileInput.files[0], 'activities');
+    }
+    const payload = {
+      title,
+      category: val('f_category') || null,
+      target_audience: val('f_target') || null,
+      date: document.getElementById('f_date').value || null,
+      time: val('f_time') || null,
+      location: val('f_location') || null,
+      description: document.getElementById('f_description').value || null,
+      cover_image_url: coverUrl
+    };
+    if (!existing) {
+      payload.slug = title.trim().toLowerCase().replace(/[^\u0600-\u06FFa-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36);
+      payload.status = 'draft';
+    }
+    if (existing) {
+      const { error } = await sb.from('activities').update(payload).eq('id', existing.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_UPDATED_ACTIVITY', 'activities', existing.id, `تعديل النشاط ${title}`);
+    } else {
+      const { data, error } = await sb.from('activities').insert(payload).select().single();
+      if (error) throw error;
+      await Auth.log('ADMIN_CREATED_ACTIVITY', 'activities', data.id, `إضافة نشاط جديد: ${title}`);
+    }
+    t.remove(); notify.success('تم حفظ النشاط بنجاح');
+    load();
+  } catch (err) {
+    t.remove();
+    notify.fromError(err, 'تعذر حفظ النشاط، حاول مرة أخرى.');
+  }
+}
+
+async function setStatus(a, status) {
+  if (status === 'published' && (!a.title || !a.date || !a.description)) {
+    notify.error('لا يمكن نشر نشاط ناقص، تأكد من العنوان والتاريخ والوصف.');
+    return;
+  }
+  const t = notify.loading('جاري التحديث...');
+  try {
+    const { error } = await sb.from('activities').update({ status }).eq('id', a.id);
+    if (error) throw error;
+    await Auth.log(status === 'published' ? 'ADMIN_PUBLISHED_ACTIVITY' : 'ADMIN_ARCHIVED_ACTIVITY', 'activities', a.id, `تغيير حالة النشاط ${a.title} إلى ${statusLabel(status)}`);
+    t.remove(); notify.success('تم التحديث بنجاح');
+    load();
+  } catch (err) {
+    t.remove(); notify.fromError(err, 'تعذر التحديث');
+  }
+}
+
+function confirmDelete(a) {
+  openModal(`
+    <h3>تأكيد الحذف</h3>
+    <p>هل تريد حذف النشاط <strong>${esc(a.title)}</strong>؟</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirmDeleteBtn">حذف</button>
+      <button class="btn btn-outline" data-close>إلغاء</button>
+    </div>`);
+  document.getElementById('confirmDeleteBtn').onclick = async () => {
+    closeModal();
+    const t = notify.loading('جاري الحذف...');
+    try {
+      const { error } = await sb.from('activities').update({ deleted_at: new Date().toISOString() }).eq('id', a.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_DELETED_ACTIVITY', 'activities', a.id, `حذف النشاط ${a.title}`);
+      t.remove(); notify.success('تم حذف النشاط');
+      load();
+    } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحذف'); }
+  };
+}
+
+async function uploadFile(file, folder) {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  if (!allowed.includes(file.type)) throw new Error('نوع الملف غير مدعوم، استخدم صورة JPG أو PNG أو WEBP.');
+  if (file.size > 5 * 1024 * 1024) throw new Error('حجم الملف أكبر من 5MB.');
+  const path = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+  const { error } = await sb.storage.from('association-media').upload(path, file, { upsert: false });
+  if (error) throw error;
+  const { data } = sb.storage.from('association-media').getPublicUrl(path);
+  return data.publicUrl;
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function attr(v) { return esc(v); }
+function openModal(html) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay'; overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal-box">${html}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.hasAttribute('data-close')) closeModal(); });
+}
+function closeModal() { const el = document.getElementById('modalOverlay'); if (el) el.remove(); }
+</script>
+</body>
+</html>

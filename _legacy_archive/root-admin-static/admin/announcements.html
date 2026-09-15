@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>الإعلانات — لوحة إدارة الجمعية</title>
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script>
+(async function init() {
+  const profile = await Auth.requireAuth(['super_admin', 'editor']);
+  if (!profile) return;
+  const main = AdminLayout.render(profile, 'announcements');
+  main.innerHTML = `
+    <div class="page-header">
+      <div><h1>الإعلانات</h1><div class="page-subtitle">تظهر الإعلانات النشطة فقط في الشريط العلوي بالموقع</div></div>
+      <button class="btn btn-primary" id="addBtn">+ إعلان جديد</button>
+    </div>
+    <div class="panel"><div id="list" class="state-box">جاري التحميل...</div></div>
+  `;
+  document.getElementById('addBtn').onclick = () => openForm(null);
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('list');
+  el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+  try {
+    const { data, error } = await sb.from('announcements').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    if (!data.length) { el.innerHTML = '<div class="state-box">لا توجد إعلانات بعد.</div>'; return; }
+    el.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>النص</th><th>الفترة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>${data.map(a => `
+          <tr data-id="${a.id}">
+            <td>${esc(a.text)}</td>
+            <td style="font-size:.8rem;">${fmtRange(a.start_at, a.end_at)}</td>
+            <td><span class="badge badge-${a.is_active ? 'active' : 'inactive'}">${a.is_active ? 'نشط' : 'موقوف'}</span></td>
+            <td style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="btn btn-outline btn-sm" data-action="edit">تعديل</button>
+              <button class="btn btn-danger btn-sm" data-action="delete">حذف</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    el.querySelectorAll('[data-action="edit"]').forEach(b => b.onclick = () => openForm(find(data, b)));
+    el.querySelectorAll('[data-action="delete"]').forEach(b => b.onclick = () => confirmDelete(find(data, b)));
+  } catch (err) {
+    notify.fromError(err, 'تعذر تحميل الإعلانات');
+    el.innerHTML = '<div class="state-box">تعذر التحميل.</div>';
+  }
+}
+
+function find(data, btn) { return data.find(x => x.id === btn.closest('tr').dataset.id); }
+function fmtRange(s, e) {
+  const f = (d) => d ? new Date(d).toLocaleDateString('ar-MA') : '—';
+  return `${f(s)} → ${f(e)}`;
+}
+
+function openForm(a) {
+  openModal(`
+    <h3>${a ? 'تعديل' : 'إضافة'} إعلان</h3>
+    <form id="f">
+      <div class="form-group"><label>نص الإعلان *</label><textarea required id="f_text">${esc(a?.text || '')}</textarea></div>
+      <div class="form-group"><label>رابط (اختياري)</label><input id="f_link" value="${attr(a?.link)}"></div>
+      <div class="form-row-2">
+        <div class="form-group"><label>تاريخ البداية</label><input type="date" id="f_start" value="${a?.start_at ? a.start_at.substring(0,10) : ''}"></div>
+        <div class="form-group"><label>تاريخ النهاية</label><input type="date" id="f_end" value="${a?.end_at ? a.end_at.substring(0,10) : ''}"></div>
+      </div>
+      <div class="form-group"><label><input type="checkbox" id="f_active" ${a?.is_active !== false ? 'checked' : ''}> نشط</label></div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">حفظ</button>
+        <button type="button" class="btn btn-outline" data-close>إلغاء</button>
+      </div>
+    </form>`);
+  document.getElementById('f').onsubmit = (e) => { e.preventDefault(); save(a); };
+}
+
+async function save(existing) {
+  const text = document.getElementById('f_text').value.trim();
+  if (!text) { notify.error('نص الإعلان مطلوب'); return; }
+  closeModal();
+  const t = notify.loading('جاري الحفظ...');
+  try {
+    const payload = {
+      text,
+      link: document.getElementById('f_link').value.trim() || null,
+      start_at: document.getElementById('f_start').value || null,
+      // إصلاح: كان تاريخ النهاية يُحفظ كمنتصف ليل ذلك اليوم (00:00:00)، فتصبح سياسة
+      // RLS "end_at >= now()" تُخفي الإعلان منذ بداية آخر يوم فعليًا بدل نهايته —
+      // أي أن اختيار "ينتهي اليوم" كان يُخفي الإعلان فورًا تقريبًا. الآن يُحفظ في
+      // نهاية اليوم المختار (23:59:59) ليبقى ظاهرًا طوال اليوم الأخير كما هو متوقع.
+      end_at: document.getElementById('f_end').value ? `${document.getElementById('f_end').value}T23:59:59` : null,
+      is_active: document.getElementById('f_active').checked
+    };
+    if (existing) {
+      const { error } = await sb.from('announcements').update(payload).eq('id', existing.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_UPDATED_ANNOUNCEMENT', 'announcements', existing.id, `تعديل إعلان: ${text.slice(0, 60)}`);
+    } else {
+      const { data, error } = await sb.from('announcements').insert(payload).select().single();
+      if (error) throw error;
+      await Auth.log('ADMIN_CREATED_ANNOUNCEMENT', 'announcements', data?.id || null, `إضافة إعلان جديد: ${text.slice(0, 60)}`);
+    }
+    t.remove(); notify.success('تم الحفظ بنجاح'); load();
+  } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحفظ'); }
+}
+
+function confirmDelete(a) {
+  openModal(`
+    <h3>تأكيد الحذف</h3><p>حذف هذا الإعلان؟</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirmBtn">حذف</button>
+      <button class="btn btn-outline" data-close>إلغاء</button>
+    </div>`);
+  document.getElementById('confirmBtn').onclick = async () => {
+    closeModal();
+    const t = notify.loading('جاري الحذف...');
+    try {
+      const { error } = await sb.from('announcements').delete().eq('id', a.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_DELETED_ANNOUNCEMENT', 'announcements', a.id, `حذف إعلان: ${(a.text || '').slice(0, 60)}`);
+      t.remove(); notify.success('تم الحذف'); load();
+    } catch (err) { t.remove(); notify.fromError(err, 'تعذر الحذف'); }
+  };
+}
+
+function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function attr(v) { return esc(v); }
+function openModal(html) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay'; overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal-box">${html}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.hasAttribute('data-close')) closeModal(); });
+}
+function closeModal() { const el = document.getElementById('modalOverlay'); if (el) el.remove(); }
+</script>
+</body>
+</html>

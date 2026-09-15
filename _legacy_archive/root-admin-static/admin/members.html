@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>الأعضاء — لوحة إدارة الجمعية</title>
+<link rel="icon" href="../logo.jpg" type="image/jpeg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+<style>
+  .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center; }
+  .toolbar input, .toolbar select { padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-family:inherit; font-size:.86rem; }
+  .toolbar input { min-width:220px; flex:1; }
+  .pagination { display:flex; gap:8px; justify-content:center; margin-top:16px; }
+  .pagination button { padding:6px 12px; border:1px solid var(--border); background:#fff; border-radius:6px; font-size:.85rem; }
+  .pagination button.active { background:var(--gold); border-color:var(--gold); font-weight:700; }
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4"></script>
+<script src="../js/supabase.js"></script>
+<script src="../js/notifications.js"></script>
+<script src="../js/auth.js"></script>
+<script src="../js/admin-layout.js"></script>
+<script>
+const PAGE_SIZE = 15;
+let state = { page: 1, search: '', status: '', promotion: '' };
+let currentProfile = null;
+
+(async function init() {
+  const profile = await Auth.requireAuth(['super_admin', 'members_manager']);
+  if (!profile) return;
+  currentProfile = profile;
+
+  const main = AdminLayout.render(profile, 'members');
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <h1>الأعضاء</h1>
+        <div class="page-subtitle">إدارة جميع أعضاء الجمعية</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-outline" id="exportBtn">تصدير CSV</button>
+        <button class="btn btn-primary" id="addBtn">+ إضافة عضو</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="toolbar">
+        <input type="text" id="searchInput" placeholder="ابحث بالاسم، المهنة، المدينة، الدفعة...">
+        <select id="statusFilter">
+          <option value="">كل الحالات</option>
+          <option value="active">نشط</option>
+          <option value="inactive">غير نشط</option>
+        </select>
+      </div>
+      <div id="membersList" class="state-box">جاري التحميل...</div>
+      <div class="pagination" id="pagination"></div>
+    </div>
+  `;
+
+  document.getElementById('addBtn').addEventListener('click', () => openMemberForm(null));
+  document.getElementById('exportBtn').addEventListener('click', exportCsv);
+  document.getElementById('searchInput').addEventListener('input', debounce((e) => { state.search = e.target.value; state.page = 1; load(); }, 350));
+  document.getElementById('statusFilter').addEventListener('change', (e) => { state.status = e.target.value; state.page = 1; load(); });
+
+  load();
+})();
+
+async function load() {
+  const el = document.getElementById('membersList');
+  el.innerHTML = '<div class="state-box">جاري التحميل...</div>';
+  try {
+    let query = sb.from('members').select('*', { count: 'exact' }).is('deleted_at', null);
+    if (state.status) query = query.eq('status', state.status);
+    if (state.search) {
+      const s = state.search.replace(/[%_]/g, '');
+      query = query.or(`full_name.ilike.%${s}%,profession.ilike.%${s}%,city.ilike.%${s}%,promotion.ilike.%${s}%`);
+    }
+    const from = (state.page - 1) * PAGE_SIZE;
+    query = query.order('created_at', { ascending: false }).range(from, from + PAGE_SIZE - 1);
+
+    const { data, error, count } = await query;
+    if (error) throw error;
+
+    if (!data.length) {
+      el.innerHTML = '<div class="state-box">لا يوجد أعضاء مطابقون.</div>';
+      document.getElementById('pagination').innerHTML = '';
+      return;
+    }
+
+    el.innerHTML = `
+      <table class="data-table">
+        <thead><tr><th>الاسم</th><th>الدفعة</th><th>المهنة</th><th>المدينة</th><th>الحالة</th><th>إجراءات</th></tr></thead>
+        <tbody>
+          ${data.map(m => `
+            <tr data-id="${m.id}">
+              <td>${escapeHtml(m.full_name)}</td>
+              <td>${escapeHtml(m.promotion || '—')}</td>
+              <td>${escapeHtml(m.profession || '—')}</td>
+              <td>${escapeHtml(m.city || '—')}</td>
+              <td><span class="badge badge-${m.status}">${m.status === 'active' ? 'نشط' : 'غير نشط'}</span></td>
+              <td style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn btn-outline btn-sm" data-action="edit">تعديل</button>
+                <button class="btn btn-danger btn-sm" data-action="delete">حذف</button>
+              </td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    `;
+    el.querySelectorAll('[data-action="edit"]').forEach(b => b.addEventListener('click', () => {
+      const m = data.find(x => x.id === b.closest('tr').dataset.id);
+      openMemberForm(m);
+    }));
+    el.querySelectorAll('[data-action="delete"]').forEach(b => b.addEventListener('click', () => {
+      const m = data.find(x => x.id === b.closest('tr').dataset.id);
+      confirmDelete(m);
+    }));
+
+    renderPagination(count);
+  } catch (err) {
+    notify.fromError(err, 'تعذر تحميل الأعضاء');
+    el.innerHTML = '<div class="state-box">تعذر تحميل الأعضاء.</div>';
+  }
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const el = document.getElementById('pagination');
+  if (pages <= 1) { el.innerHTML = ''; return; }
+  let html = '';
+  for (let i = 1; i <= pages; i++) {
+    html += `<button class="${i === state.page ? 'active' : ''}" data-page="${i}">${i}</button>`;
+  }
+  el.innerHTML = html;
+  el.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    state.page = parseInt(b.dataset.page, 10);
+    load();
+  }));
+}
+
+function openMemberForm(member) {
+  const isEdit = !!member;
+  openModal(`
+    <h3>${isEdit ? 'تعديل عضو' : 'إضافة عضو جديد'}</h3>
+    <form id="memberForm">
+      <div class="form-group"><label>الاسم الكامل *</label><input required id="f_full_name" value="${escapeAttr(member?.full_name)}"></div>
+      <div class="form-group"><label>الصورة الشخصية</label><input type="file" id="f_photo" accept="image/*">
+        ${member?.photo_url ? `<div style="font-size:.8rem;color:var(--muted);margin-top:4px;">صورة حالية موجودة، اختر ملفًا جديدًا فقط لاستبدالها.</div>` : ''}
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>الدفعة</label><input id="f_promotion" value="${escapeAttr(member?.promotion)}"></div>
+        <div class="form-group"><label>الشعبة</label><input id="f_track" value="${escapeAttr(member?.track)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>المهنة</label><input id="f_profession" value="${escapeAttr(member?.profession)}"></div>
+        <div class="form-group"><label>المدينة</label><input id="f_city" value="${escapeAttr(member?.city)}"></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="f_email" value="${escapeAttr(member?.email)}"></div>
+        <div class="form-group"><label>الهاتف</label><input id="f_phone" value="${escapeAttr(member?.phone)}"></div>
+      </div>
+      <div class="form-group"><label>الحالة</label>
+        <select id="f_status">
+          <option value="active" ${member?.status !== 'inactive' ? 'selected' : ''}>نشط</option>
+          <option value="inactive" ${member?.status === 'inactive' ? 'selected' : ''}>غير نشط</option>
+        </select>
+      </div>
+      <div class="form-group"><label>نبذة</label><textarea id="f_bio">${escapeHtml(member?.bio || '')}</textarea></div>
+      <div class="modal-actions">
+        <button type="submit" class="btn btn-primary">${isEdit ? 'حفظ التعديلات' : 'إضافة العضو'}</button>
+        <button type="button" class="btn btn-outline" data-close>إلغاء</button>
+      </div>
+    </form>
+  `);
+  document.getElementById('memberForm').addEventListener('submit', (e) => { e.preventDefault(); saveMember(member); });
+}
+
+async function saveMember(existing) {
+  const payload = {
+    full_name: val('f_full_name'),
+    promotion: val('f_promotion') || null,
+    track: val('f_track') || null,
+    profession: val('f_profession') || null,
+    city: val('f_city') || null,
+    email: val('f_email') || null,
+    phone: val('f_phone') || null,
+    status: val('f_status'),
+    bio: val('f_bio') || null
+  };
+  if (!payload.full_name) { notify.error('الاسم الكامل مطلوب'); return; }
+
+  closeModal();
+  const t = notify.loading(existing ? 'جاري حفظ التعديلات...' : 'جاري إضافة العضو...');
+  try {
+    // إصلاح: لم تكن هذه الصفحة تحتوي على أي حقل لرفع الصورة الشخصية رغم أن
+    // عمود photo_url موجود في القاعدة، والموقع العام يعرضه فعليًا لكل عضو
+    // (js/members.js)، وسياسات تخزين association-media تسمح بذلك أصلاً لمجلد
+    // members/ — كانت الفجوة في الواجهة فقط.
+    const fileInput = document.getElementById('f_photo');
+    if (fileInput && fileInput.files[0]) {
+      payload.photo_url = await uploadFile(fileInput.files[0], 'members');
+    }
+    if (existing) {
+      const { error } = await sb.from('members').update(payload).eq('id', existing.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_UPDATED_MEMBER', 'members', existing.id, `تعديل بيانات العضو ${payload.full_name}`);
+      t.remove(); notify.success('تم حفظ التعديلات بنجاح');
+    } else {
+      const { data, error } = await sb.from('members').insert(payload).select().single();
+      if (error) throw error;
+      await Auth.log('ADMIN_CREATED_MEMBER', 'members', data.id, `إضافة عضو جديد: ${payload.full_name}`);
+      t.remove(); notify.success('تمت إضافة العضو بنجاح');
+    }
+    load();
+  } catch (err) {
+    t.remove();
+    notify.fromError(err, 'تعذر حفظ البيانات، حاول مرة أخرى.');
+  }
+}
+
+function confirmDelete(m) {
+  openModal(`
+    <h3>تأكيد الحذف</h3>
+    <p>هل تريد حذف العضو <strong>${escapeHtml(m.full_name)}</strong>؟ يمكن استرجاعه لاحقًا من قاعدة البيانات.</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="confirmDeleteBtn">حذف</button>
+      <button class="btn btn-outline" data-close>إلغاء</button>
+    </div>
+  `);
+  document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+    closeModal();
+    const t = notify.loading('جاري الحذف...');
+    try {
+      const { error } = await sb.from('members').update({ deleted_at: new Date().toISOString() }).eq('id', m.id);
+      if (error) throw error;
+      await Auth.log('ADMIN_DELETED_MEMBER', 'members', m.id, `حذف العضو ${m.full_name}`);
+      t.remove(); notify.success('تم حذف العضو');
+      load();
+    } catch (err) {
+      t.remove();
+      notify.fromError(err, 'تعذر الحذف');
+    }
+  });
+}
+
+async function exportCsv() {
+  const t = notify.loading('جاري تجهيز الملف...');
+  try {
+    const { data, error } = await sb.from('members').select('full_name,promotion,track,profession,city,email,phone,status').is('deleted_at', null);
+    if (error) throw error;
+    const headers = ['full_name','promotion','track','profession','city','email','phone','status'];
+    const csv = [headers.join(',')].concat(
+      data.map(r => headers.map(h => `"${String(r[h] ?? '').replace(/"/g,'""')}"`).join(','))
+    ).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'members.csv'; a.click();
+    URL.revokeObjectURL(url);
+    t.remove();
+  } catch (err) {
+    t.remove();
+    notify.fromError(err, 'تعذر تصدير الملف');
+  }
+}
+
+function val(id) { return document.getElementById(id).value.trim(); }
+async function uploadFile(file, folder) {
+  const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  if (!allowed.includes(file.type)) throw new Error('نوع الملف غير مدعوم، استخدم صورة JPG أو PNG أو WEBP.');
+  if (file.size > 5 * 1024 * 1024) throw new Error('حجم الملف أكبر من 5MB.');
+  const path = `${folder}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_')}`;
+  const { error } = await sb.storage.from('association-media').upload(path, file, { upsert: false });
+  if (error) throw error;
+  const { data } = sb.storage.from('association-media').getPublicUrl(path);
+  return data.publicUrl;
+}
+function debounce(fn, ms) { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; }
+function openModal(html) {
+  closeModal();
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay'; overlay.id = 'modalOverlay';
+  overlay.innerHTML = `<div class="modal-box">${html}</div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay || e.target.hasAttribute('data-close')) closeModal(); });
+}
+function closeModal() { const el = document.getElementById('modalOverlay'); if (el) el.remove(); }
+function escapeHtml(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escapeAttr(v) { return escapeHtml(v); }
+</script>
+</body>
+</html>
