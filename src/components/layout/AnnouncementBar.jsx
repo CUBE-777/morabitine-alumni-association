@@ -1,21 +1,27 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { safeUrl } from '../../utils/sanitize';
 
 export default function AnnouncementBar({ announcement }) {
+  const { t } = useTranslation();
   const [closed, setClosed] = useState(false);
   if (!announcement || closed) return null;
 
   const link = safeUrl(announcement.link);
 
   return (
-    <div id="announcementBar" dir="rtl" className="announcement-bar">
+    <div id="announcementBar" className="announcement-bar">
       <span>{announcement.text}</span>
       {link && (
         <a href={link} className="announcement-bar-link">
-          التفاصيل ←
+          {t('common.detailsLink')}
         </a>
       )}
-      <button aria-label="إغلاق الإعلان" className="announcement-bar-close" onClick={() => setClosed(true)}>
+      <button
+        aria-label={t('common.closeAnnouncement')}
+        className="announcement-bar-close"
+        onClick={() => setClosed(true)}
+      >
         ×
       </button>
     </div>

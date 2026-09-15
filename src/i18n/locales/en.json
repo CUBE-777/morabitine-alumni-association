@@ -1,182 +1,250 @@
 {
-  "_i18n_status": "PLACEHOLDER — محتوى عربي مؤقت بانتظار الترجمة الفعلية إلى هذه اللغة. راجع تقرير الترحيل.",
   "nav": {
-    "home": "الرئيسية",
-    "about": "من نحن",
-    "activities": "أنشطتنا",
-    "members": "الأعضاء",
-    "gallery": "معرض الصور",
-    "join": "انخرط معنا",
-    "contact": "اتصل بنا"
+    "home": "Home",
+    "about": "About Us",
+    "activities": "Our Activities",
+    "members": "Members",
+    "gallery": "Gallery",
+    "join": "Join Us",
+    "contact": "Contact"
   },
   "brand": {
-    "name": "جمعية خريجي ثانوية المرابطين",
-    "tagline": "خريجون... لكن مهمتنا تستمر"
+    "name": "Al Mourabitine High School Alumni Association",
+    "tagline": "Graduates... but our mission continues"
   },
   "hero": {
-    "badge": "🎓 خريجو ثانوية المرابطين ببيوكرة — جيل يبني على جيل",
-    "titlePrefix": "معاً نبني ",
-    "titleEmphasis": "جسرًا بين الأجيال",
-    "titleSuffix": "، من مقاعد الدراسة إلى ميدان العطاء",
-    "description": "جمعية تجمع خريجي ثانوية المرابطين للحفاظ على أواصر الأخوة، ورد الجميل لمدرستنا، ودعم أجيال التلاميذ القادمة.",
-    "ctaJoin": "انخرط معنا",
-    "ctaActivities": "اكتشف أنشطتنا"
+    "badge": "🎓 Alumni of Al Mourabitine High School, Biougra — a generation building on a generation",
+    "titlePrefix": "Together, we build ",
+    "titleEmphasis": "a bridge between generations",
+    "titleSuffix": ", from the classroom to the field of giving",
+    "description": "An association bringing together the alumni of Al Mourabitine High School to preserve the bonds of brotherhood, give back to our school, and support the coming generations of students.",
+    "ctaJoin": "Join Us",
+    "ctaActivities": "Discover Our Activities"
   },
   "about": {
-    "eyebrow": "من نحن",
-    "title": "قصة جيل يعود ليمد يد العون",
-    "p1": "تأسست <strong>جمعية خريجي ثانوية المرابطين</strong> برغبة صادقة من مجموعة من الخريجين في الحفاظ على الرابطة التي جمعتهم يوماً على مقاعد الدراسة، وتحويلها إلى عمل جمعوي حقيقي يخدم المدرسة والمجتمع المحلي.",
-    "p2": "نؤمن بأن التعليم جسرٌ يُبنى جيلاً بعد جيل، ولذلك نعمل على <strong>جمع شمل الخريجين</strong>، وخلق فضاءات للتواصل والتعاون، ودعم التلاميذ الحاليين بكل ما يملكه الخريجون من خبرة وتجربة.",
+    "eyebrow": "About Us",
+    "title": "The story of a generation giving back",
+    "p1": "The <strong>Al Mourabitine High School Alumni Association</strong> was founded out of a genuine desire by a group of graduates to preserve the bond that once united them at school, and to turn it into real community work serving the school and the local community.",
+    "p2": "We believe education is a bridge built generation after generation. That is why we work to <strong>bring alumni together</strong>, create spaces for connection and cooperation, and support current students with the experience and knowledge our alumni have gained.",
     "pillars": [
       {
-        "num": "١",
-        "title": "التواصل",
-        "desc": "لمّ شمل خريجي الثانوية عبر مختلف الأجيال والدفعات."
+        "num": "1",
+        "title": "Connection",
+        "desc": "Bringing together alumni of the school across different generations and graduating classes."
       },
       {
-        "num": "٢",
-        "title": "الدعم",
-        "desc": "مواكبة التلاميذ الحاليين علمياً واجتماعياً كلما أمكن ذلك."
+        "num": "2",
+        "title": "Support",
+        "desc": "Supporting current students academically and socially whenever possible."
       },
       {
-        "num": "٣",
-        "title": "التكوين",
-        "desc": "تنظيم لقاءات وورشات يستفيد منها الخريجون والتلاميذ معاً."
+        "num": "3",
+        "title": "Development",
+        "desc": "Organizing meetings and workshops that benefit both alumni and students."
       },
       {
-        "num": "٤",
-        "title": "التطوع",
-        "desc": "الانخراط في مبادرات تضامنية تخدم المدرسة والحي المحيط بها."
+        "num": "4",
+        "title": "Volunteering",
+        "desc": "Engaging in solidarity initiatives that serve the school and its surrounding neighborhood."
       }
     ]
   },
   "activities": {
-    "eyebrow": "أنشطتنا ومشاريعنا",
-    "title": "ما نقوم به على أرض الواقع",
-    "description": "مجموعة من الأنشطة والمشاريع التي تجسد رسالة الجمعية، قابلة للتطور والإضافة مع نمو عمل الجمعية.",
-    "viewDetails": "عرض التفاصيل ←",
+    "eyebrow": "Our Activities & Projects",
+    "title": "What we do on the ground",
+    "description": "A set of activities and projects that embody the association's mission, growing and evolving alongside our work.",
+    "viewDetails": "View Details ←",
     "fallback": [
       {
         "icon": "🤝",
-        "title": "لقاء الخريجين السنوي",
-        "desc": "لقاء دوري يجمع خريجي مختلف الدفعات لتجديد الصلة وتبادل الأخبار والتجارب.",
+        "title": "Annual Alumni Gathering",
+        "desc": "A recurring gathering bringing together alumni from different graduating classes to reconnect and share news and experiences.",
         "slug": "annual-meeting"
       },
       {
         "icon": "📚",
-        "title": "برنامج المواكبة الدراسية",
-        "desc": "مبادرة لدعم التلاميذ الحاليين عبر حصص توجيه ومساعدة في المواد الأساسية.",
+        "title": "Academic Mentorship Program",
+        "desc": "An initiative to support current students through guidance sessions and help with core subjects.",
         "slug": "study-mentorship"
       },
       {
         "icon": "🎒",
-        "title": "دعم التلاميذ المحتاجين",
-        "desc": "مساهمات وتبرعات عينية لتوفير الأدوات واللوازم المدرسية عند الحاجة.",
+        "title": "Support for Students in Need",
+        "desc": "Contributions and in-kind donations to provide school tools and supplies when needed.",
         "slug": "student-support"
       },
       {
         "icon": "🌱",
-        "title": "مبادرات تطوعية",
-        "desc": "حملات تحسيسية وتطوعية داخل المؤسسة وفي الحي، بمشاركة الخريجين والتلاميذ.",
+        "title": "Volunteer Initiatives",
+        "desc": "Awareness and volunteer campaigns within the school and the neighborhood, with the participation of alumni and students.",
         "slug": "volunteer-initiatives"
       }
     ]
   },
   "members": {
-    "eyebrow": "أعضاؤنا",
-    "title": "تعرف على أعضاء الجمعية",
-    "description": "اطّلع على المكتب المسير الحالي، أو تصفّح قائمة المنخرطين.",
-    "boardEyebrow": "القيادة",
-    "boardTitle": "المكتب المسير الحالي",
-    "boardDesc": "تعرّف على الأعضاء المكلفين بتسيير الجمعية وتنفيذ قراراتها.",
-    "boardCta": "عرض المكتب ←",
-    "membersEyebrow": "المنخرطون",
-    "membersTitle": "الأعضاء",
-    "membersDesc": "قائمة خريجي الثانوية المنخرطين في رسالة الجمعية وأنشطتها.",
-    "membersCta": "عرض الأعضاء ←"
+    "eyebrow": "Our Members",
+    "title": "Meet the Association's Members",
+    "description": "Browse the current executive board, or view the list of members.",
+    "boardEyebrow": "Leadership",
+    "boardTitle": "Current Executive Board",
+    "boardDesc": "Meet the members responsible for leading the association and carrying out its decisions.",
+    "boardCta": "View the Board ←",
+    "membersEyebrow": "Members",
+    "membersTitle": "Members",
+    "membersDesc": "List of high school alumni who are members contributing to the association's mission and activities.",
+    "membersCta": "View Members ←"
   },
   "gallery": {
-    "eyebrow": "لحظات من مسيرتنا",
-    "title": "معرض الصور",
-    "description": "صور من أنشطة وفعاليات الجمعية، يتم تحديثها بشكل دوري.",
-    "empty": "سيتم إضافة صور الأنشطة هنا قريباً."
+    "eyebrow": "Moments From Our Journey",
+    "title": "Gallery",
+    "description": "Photos from the association's activities and events, updated regularly.",
+    "empty": "Photos from activities will be added here soon."
   },
   "join": {
-    "eyebrow": "شارك معنا",
-    "title": "كن جزءاً من القصة",
-    "description": "سواء بوقتك أو بخبرتك أو بدعمك، كل مساهمة تصنع فرقاً في مسار تلميذ اليوم.",
-    "membershipEyebrow": "العضوية",
-    "membershipTitle": "كن عضواً في الجمعية",
-    "membershipDesc": "انضم إلى شبكة خريجي الثانوية وساهم في أنشطتها وقراراتها.",
+    "eyebrow": "Get Involved",
+    "title": "Be Part of the Story",
+    "description": "Whether through your time, your expertise, or your support, every contribution makes a difference in a student's journey today.",
+    "membershipEyebrow": "Membership",
+    "membershipTitle": "Become a Member of the Association",
+    "membershipDesc": "Join the network of high school alumni and contribute to its activities and decisions.",
     "membershipList": [
-      "المشاركة في اجتماعات الجمعية وأنشطتها",
-      "التواصل مع خريجي مختلف الدفعات",
-      "فرصة للمساهمة في التوجيه والتخطيط"
+      "Take part in the association's meetings and activities",
+      "Connect with alumni from different graduating classes",
+      "An opportunity to contribute to guidance and planning"
     ],
     "form": {
-      "name": "الاسم الكامل",
-      "namePlaceholder": "اكتب اسمك",
-      "phone": "رقم الهاتف",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your name",
+      "phone": "Phone Number",
       "phonePlaceholder": "06 XX XX XX XX",
-      "email": "البريد الإلكتروني",
+      "email": "Email Address",
       "emailPlaceholder": "example@email.com",
-      "promo": "دفعة التخرج",
-      "promoPlaceholder": "مثال: 2015",
-      "track": "الشعبة",
-      "trackPlaceholder": "اختر شعبتك",
+      "promo": "Graduating Class",
+      "promoPlaceholder": "e.g. 2015",
+      "track": "Track",
+      "trackPlaceholder": "Select your track",
       "tracks": [
-        "علوم تجريبية",
-        "علوم رياضية",
-        "آداب وعلوم إنسانية",
-        "اقتصاد وتدبير",
-        "علوم شرعية",
-        "أخرى"
+        "Experimental Sciences",
+        "Mathematical Sciences",
+        "Arts and Humanities",
+        "Economics and Management",
+        "Islamic Sciences",
+        "Other"
       ],
-      "message": "لماذا تريد الانضمام؟ (اختياري)",
-      "messagePlaceholder": "اكتب رسالة قصيرة...",
-      "submit": "إرسال طلب الانخراط",
-      "submitting": "جاري الإرسال...",
-      "error": "تعذر إرسال الطلب، تحقق من اتصالك بالإنترنت وحاول مرة أخرى."
+      "message": "Why do you want to join? (optional)",
+      "messagePlaceholder": "Write a short message...",
+      "submit": "Send Membership Request",
+      "submitting": "Sending...",
+      "error": "Unable to send the request. Please check your internet connection and try again."
     },
-    "donateEyebrow": "التبرع",
-    "donateTitle": "ادعم مشاريع الجمعية",
-    "donateDesc": "تبرعك، مهما كان حجمه، يساهم مباشرة في دعم التلاميذ ومشاريع المدرسة.",
+    "donateEyebrow": "Donate",
+    "donateTitle": "Support the Association's Projects",
+    "donateDesc": "Your donation, no matter the size, directly supports students and school projects.",
     "donateList": [
-      "دعم اللوازم المدرسية للمحتاجين",
-      "تمويل برامج المواكبة الدراسية",
-      "المساهمة في الأنشطة والفعاليات"
+      "Supporting school supplies for students in need",
+      "Funding academic mentorship programs",
+      "Contributing to activities and events"
     ],
-    "donateCta": "تواصل للتبرع",
-    "donateWhatsappText": "السلام عليكم، أرغب في التبرع لدعم مشاريع الجمعية"
+    "donateCta": "Contact Us to Donate",
+    "donateWhatsappText": "Hello, I would like to make a donation to support the association's projects"
   },
   "contact": {
-    "eyebrow": "اتصل بنا",
-    "title": "نسعد بتواصلكم معنا",
-    "emailLabel": "البريد الإلكتروني",
-    "phoneLabel": "الهاتف",
-    "addressLabel": "العنوان",
+    "eyebrow": "Contact",
+    "title": "We'd Love to Hear From You",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "addressLabel": "Address",
     "defaultEmail": "a.laureats.almourabitine@gmail.com",
     "defaultPhone": "+212 679 672 284",
-    "defaultAddress": "الثانوية التأهيلية المرابطين، بيوكرة، اشتوكة آيت باها",
+    "defaultAddress": "Al Mourabitine Qualifying High School, Biougra, Chtouka Ait Baha",
     "form": {
-      "name": "الاسم الكامل",
-      "namePlaceholder": "اكتب اسمك",
-      "promo": "دفعة التخرج (اختياري)",
-      "promoPlaceholder": "مثال: 2015",
-      "email": "البريد الإلكتروني",
+      "name": "Full Name",
+      "namePlaceholder": "Enter your name",
+      "promo": "Graduating Class (optional)",
+      "promoPlaceholder": "e.g. 2015",
+      "email": "Email Address",
       "emailPlaceholder": "example@email.com",
-      "message": "رسالتك",
-      "messagePlaceholder": "اكتب رسالتك هنا...",
-      "submit": "إرسال الرسالة",
-      "note": "ستصلنا رسالتك مباشرة، وسنتواصل معك عبر بريدك الإلكتروني."
+      "message": "Your Message",
+      "messagePlaceholder": "Write your message here...",
+      "submit": "Send Message",
+      "note": "Your message will reach us directly, and we'll get back to you by email."
     }
   },
   "footer": {
-    "copyright": "© 2026 جمعية خريجي ثانوية المرابطين. جميع الحقوق محفوظة."
+    "copyright": "© 2026 Al Mourabitine High School Alumni Association. All rights reserved."
+  },
+  "common": {
+    "detailsLink": "Details ←",
+    "closeAnnouncement": "Close announcement"
+  },
+  "activityPage": {
+    "activitiesCrumb": "Our Activities",
+    "detailsCrumbFallback": "Activity Details",
+    "loadingTitle": "Loading activity details...",
+    "dateFallback": "Activity date",
+    "locationFallback": "Location",
+    "categoryFallback": "Category",
+    "imageAlt": "Activity image",
+    "aboutTitle": "About this activity",
+    "loadingBody": "Loading the activity's details and goal...",
+    "achievementsTitle": "Completed works and projects:",
+    "extraInfoTitle": "Additional Information",
+    "dateTimeLabel": "Date & Time",
+    "locationLabel": "Venue",
+    "beneficiariesLabel": "Beneficiaries",
+    "beneficiariesFallback": "Students and school alumni",
+    "joinCta": "Participate or Join",
+    "shareCta": "Share the activity 🔗",
+    "linkCopied": "Page link copied successfully!"
+  },
+  "thankYou": {
+    "title": "Thank You for Reaching Out",
+    "message": "Your message has been received successfully. We will get back to you by email as soon as possible.",
+    "backHome": "Back to Home"
+  },
+  "notFound": {
+    "crumb": "Page Not Found",
+    "heroTitle": "404 — Page Not Found",
+    "title": "Sorry, we couldn't find that page",
+    "message": "The link you followed doesn't exist, has been moved, or is no longer available. Check the address or head back to the home page.",
+    "backHome": "Back to Home",
+    "browseMembers": "Browse Members"
   },
   "languageSwitcher": {
     "ar": "العربية",
     "fr": "Français",
     "en": "English"
-  }
+  },
+  "peoplePage": {
+    "loading": "Loading the members list...",
+    "noResults": "No results match your search.",
+    "resultsCount": "{{count}} of {{total}} results",
+    "membersTitle": "Members",
+    "membersDescription": "Al Mourabitine High School alumni who are members of the association, with a glimpse of each one's journey.",
+    "membersCrumb": "Members List",
+    "membersCountLabel": "member(s)",
+    "membersBadge": "Member",
+    "membersEmpty": "Members will be added from the admin dashboard soon.",
+    "membersSwitch": "View the current executive board",
+    "membersSearch": "Search by name, university, or graduation year",
+    "boardTitle": "Current Executive Board",
+    "boardDescription": "The members responsible for leading the association and carrying out its decisions, updated from the admin dashboard.",
+    "boardCrumb": "Executive Board",
+    "boardCountLabel": "board member(s)",
+    "boardBadge": "Executive Board",
+    "boardEmpty": "Board members will be added from the admin dashboard soon.",
+    "boardSwitch": "View the members list",
+    "boardSearch": "Search among board members"
+  },
+  "a11y": {
+    "logoAlt": "Association logo",
+    "logoAltFull": "Al Mourabitine High School Alumni Association logo",
+    "openMenu": "Open menu",
+    "galleryImageAlt": "Photo from the association's activities",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "youtube": "YouTube",
+    "whatsapp": "WhatsApp"
+  },
+  "siteTitle": "Al Mourabitine High School Alumni Association, Biougra — Official Website"
 }

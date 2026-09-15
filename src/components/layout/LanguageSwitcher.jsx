@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SUPPORTED_LANGUAGES, applyDocumentDirection } from '../../i18n';
+import { SUPPORTED_LANGUAGES, applyDocumentDirection, persistLanguage } from '../../i18n';
 
 /**
  * تصميم جديد بطلب المستخدم: يظهر فقط اسم اللغة الحالية + سهم صغير، وعند
- * الضغط عليه تنسدل قائمة بباقي اللغتين لاختيار إحداهما. لا يزال fr/en
- * محتوى placeholder بانتظار الترجمة الفعلية (انظر i18n/index.js).
+ * الضغط عليه تنسدل قائمة بباقي اللغتين لاختيار إحداهما. الاختيار يُحفظ في
+ * localStorage ليبقى بعد إعادة تحميل الصفحة (انظر i18n/index.js).
  */
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -26,6 +26,7 @@ export default function LanguageSwitcher() {
   const handleChange = (code) => {
     i18n.changeLanguage(code);
     applyDocumentDirection(code);
+    persistLanguage(code);
     setOpen(false);
   };
 

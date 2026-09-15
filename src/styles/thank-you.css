@@ -11,15 +11,15 @@
 
 .thank-you-box-wrap .box {
   max-width: 480px;
-  color: #fff;
+  color: var(--white);
 }
 
 .thank-you-box-wrap .icon {
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: rgba(242, 169, 59, 0.15);
-  border: 1px solid rgba(242, 169, 59, 0.4);
+  background: rgba(var(--gold-rgb), 0.15);
+  border: 1px solid rgba(var(--gold-rgb), 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,7 +34,7 @@
 }
 
 .thank-you-box-wrap p {
-  color: #c9d3ea;
+  color: var(--navy-tint-1);
   margin-bottom: 28px;
   line-height: 1.7;
 }

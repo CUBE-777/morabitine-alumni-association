@@ -73,18 +73,18 @@ export default function PeoplePage({
             <span className="people-count" aria-live="polite">
               {people && people.length > 0
                 ? query
-                  ? `${filtered.length} نتيجة من أصل ${people.length}`
+                  ? t('peoplePage.resultsCount', { count: filtered.length, total: people.length })
                   : `${people.length} ${countLabel}`
                 : ''}
             </span>
           </div>
 
           <div className="members-grid" id="peopleGrid">
-            {people === null && !error && <div className="gallery-empty">جاري تحميل قائمة الأعضاء...</div>}
+            {people === null && !error && <div className="gallery-empty">{t('peoplePage.loading')}</div>}
             {error && <div className="gallery-empty">{emptyText}</div>}
             {people && people.length === 0 && <div className="gallery-empty">{emptyText}</div>}
             {people && people.length > 0 && filtered.length === 0 && (
-              <div className="gallery-empty">لا توجد نتائج مطابقة للبحث.</div>
+              <div className="gallery-empty">{t('peoplePage.noResults')}</div>
             )}
             {filtered.map((person, i) => (
               <PersonCard key={`${person.name}-${i}`} person={person} fallbackBadge={fallbackBadge} />

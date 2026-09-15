@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import '../../styles/public-home.css';
 import '../../styles/interior-page.css';
 import '../../styles/activity-page.css';
@@ -11,6 +12,7 @@ import { defaultActivities } from '../../constants/defaultActivities';
 import { sanitizeRichText, safeUrl } from '../../utils/sanitize';
 
 export default function Activity() {
+  const { t } = useTranslation();
   const { slug: rawSlug } = useParams();
   const slug = rawSlug || 'annual-meeting';
   const [item, setItem] = useState(null);
@@ -32,8 +34,8 @@ export default function Activity() {
   }, [slug]);
 
   useEffect(() => {
-    if (item) document.title = `${item.title} — جمعية خريجي ثانوية المرابطين`;
-  }, [item]);
+    if (item) document.title = `${item.title} — ${t('brand.name')}`;
+  }, [item, t]);
 
   const sanitizedContent = useMemo(() => (item?.content ? sanitizeRichText(item.content) : ''), [item]);
   const imageSrc = item?.image ? safeUrl(item.image) || '/logo.jpg' : '/logo.jpg';
@@ -43,7 +45,7 @@ export default function Activity() {
       navigator.share({ title: document.title, url: window.location.href });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      window.notify?.success('تم نسخ رابط الصفحة بنجاح!') ?? alert('تم نسخ رابط الصفحة بنجاح!');
+      window.notify?.success(t('activityPage.linkCopied')) ?? alert(t('activityPage.linkCopied'));
     }
   };
 
@@ -56,19 +58,19 @@ export default function Activity() {
       <section className="activity-hero">
         <div className="container">
           <div className="breadcrumbs">
-            <Link to="/">الرئيسية</Link>
+            <Link to="/">{t('nav.home')}</Link>
             <span>‹</span>
-            <a href="/#activities">أنشطتنا</a>
+            <a href="/#activities">{t('activityPage.activitiesCrumb')}</a>
             <span>‹</span>
-            <span style={{ color: 'var(--gold)' }}>{loading ? 'تفاصيل النشاط' : item.title}</span>
+            <span style={{ color: 'var(--gold)' }}>{loading ? t('activityPage.detailsCrumbFallback') : item.title}</span>
           </div>
 
-          <h1>{loading ? 'جاري تحميل تفاصيل النشاط...' : item.title}</h1>
+          <h1>{loading ? t('activityPage.loadingTitle') : item.title}</h1>
 
           <div className="activity-meta-pills">
-            <div className="meta-pill">📅 <span>{item?.date || 'تاريخ النشاط'}</span></div>
-            <div className="meta-pill">📍 <span>{item?.location || 'الموقع'}</span></div>
-            <div className="meta-pill">🏷️ <span>{item?.category || 'الفئة'}</span></div>
+            <div className="meta-pill">📅 <span>{item?.date || t('activityPage.dateFallback')}</span></div>
+            <div className="meta-pill">📍 <span>{item?.location || t('activityPage.locationFallback')}</span></div>
+            <div className="meta-pill">🏷️ <span>{item?.category || t('activityPage.categoryFallback')}</span></div>
           </div>
         </div>
       </section>
@@ -78,14 +80,14 @@ export default function Activity() {
           <div className="activity-grid">
             <div className="main-card">
               <div className="featured-image-container">
-                <img src={imageSrc} alt="صورة النشاط" />
+                <img src={imageSrc} alt={t('activityPage.imageAlt')} />
               </div>
 
               <div className="activity-body">
                 {loading ? (
                   <>
-                    <h3>عن هذا النشاط</h3>
-                    <p>يتم تحميل تفاصيل وهدف النشاط حالياً...</p>
+                    <h3>{t('activityPage.aboutTitle')}</h3>
+                    <p>{t('activityPage.loadingBody')}</p>
                   </>
                 ) : (
                   <>
@@ -93,7 +95,7 @@ export default function Activity() {
                     <div dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
                     {item.sub_activities && item.sub_activities.length > 0 && (
                       <>
-                        <h3 style={{ marginTop: 32 }}>الأعمال والمشاريع المنجزة:</h3>
+                        <h3 style={{ marginTop: 32 }}>{t('activityPage.achievementsTitle')}</h3>
                         <div
                           style={{
                             display: 'grid',
@@ -107,7 +109,12 @@ export default function Activity() {
                             return (
                               <div
                                 key={i}
-                                style={{ background: '#f7f3ea', border: '1px solid #e9e3d5', borderRadius: 12, padding: 18 }}
+                                style={{
+                                  background: 'var(--cream)',
+                                  border: '1px solid var(--border)',
+                                  borderRadius: 12,
+                                  padding: 18,
+                                }}
                               >
                                 {subImage && (
                                   <img
@@ -116,8 +123,8 @@ export default function Activity() {
                                     alt={sub.title || ''}
                                   />
                                 )}
-                                <h4 style={{ color: '#081633', marginBottom: 8 }}>{sub.title}</h4>
-                                <p style={{ fontSize: '0.9rem', color: '#5b6784' }}>{sub.desc}</p>
+                                <h4 style={{ color: 'var(--navy-deep)', marginBottom: 8 }}>{sub.title}</h4>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{sub.desc}</p>
                               </div>
                             );
                           })}
@@ -130,35 +137,35 @@ export default function Activity() {
             </div>
 
             <div className="sidebar-card">
-              <h3>معلومات إضافية</h3>
+              <h3>{t('activityPage.extraInfoTitle')}</h3>
 
               <ul className="info-list">
                 <li>
                   <div className="info-icon">📆</div>
                   <div className="info-text">
-                    <label>التاريخ والزمان</label>
+                    <label>{t('activityPage.dateTimeLabel')}</label>
                     <span>{item?.date || '--'}</span>
                   </div>
                 </li>
                 <li>
                   <div className="info-icon">📍</div>
                   <div className="info-text">
-                    <label>مكان التنفيذ</label>
+                    <label>{t('activityPage.locationLabel')}</label>
                     <span>{item?.location || '--'}</span>
                   </div>
                 </li>
                 <li>
                   <div className="info-icon">👥</div>
                   <div className="info-text">
-                    <label>المستفيدون</label>
-                    <span>{item?.target || 'تلاميذ وخريجو الثانوية'}</span>
+                    <label>{t('activityPage.beneficiariesLabel')}</label>
+                    <span>{item?.target || t('activityPage.beneficiariesFallback')}</span>
                   </div>
                 </li>
               </ul>
 
-              <a href="/#join" className="btn btn-gold">المشاركة أو الانخراط</a>
+              <a href="/#join" className="btn btn-gold">{t('activityPage.joinCta')}</a>
               <button className="btn btn-outline" onClick={shareActivity}>
-                مشاركة النشاط 🔗
+                {t('activityPage.shareCta')}
               </button>
             </div>
           </div>

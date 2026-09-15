@@ -385,18 +385,18 @@
 }
 
 .admin-badge-pending {
-  background: rgba(242, 169, 59, 0.15);
+  background: rgba(var(--gold-rgb), 0.15);
   color: var(--gold);
 }
 
 .admin-badge-approved {
   background: rgba(31, 122, 77, 0.18);
-  color: #3ddc84;
+  color: var(--success-bright);
 }
 
 .admin-badge-rejected {
-  background: rgba(179, 38, 30, 0.18);
-  color: #f28b84;
+  background: rgba(var(--danger-rgb), 0.18);
+  color: var(--danger-bright);
 }
 
 /* ===== Forms (shared by CRUD pages, Phase 6 continuation) ===== */
@@ -461,12 +461,12 @@
 
 .admin-btn-danger {
   background: transparent;
-  border: 1px solid rgba(179, 38, 30, 0.4);
-  color: #f28b84;
+  border: 1px solid rgba(var(--danger-rgb), 0.4);
+  color: var(--danger-bright);
 }
 
 .admin-btn-danger:hover {
-  background: rgba(179, 38, 30, 0.12);
+  background: rgba(var(--danger-rgb), 0.12);
 }
 
 /* ===== Modal ===== */

@@ -13,7 +13,7 @@ export default function ProtectedRoute({ roles, children }) {
 
   if (status === 'loading') {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#8f9bc4' }}>
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--admin-text-muted, var(--muted))' }}>
         جاري التحقق من الجلسة...
       </div>
     );
@@ -46,7 +46,7 @@ export default function ProtectedRoute({ roles, children }) {
       >
         <div>
           <h1 style={{ marginBottom: 12 }}>غير مصرح لك بالوصول</h1>
-          <p style={{ color: 'var(--admin-text-muted)', marginBottom: 20 }}>لا تملك الصلاحية الكافية لعرض هذه الصفحة.</p>
+          <p style={{ color: 'var(--admin-text-muted, var(--muted))', marginBottom: 20 }}>لا تملك الصلاحية الكافية لعرض هذه الصفحة.</p>
           <a href="/admin/dashboard" style={{ color: 'var(--admin-accent)', fontWeight: 700 }}>
             العودة للوحة الرئيسية
           </a>

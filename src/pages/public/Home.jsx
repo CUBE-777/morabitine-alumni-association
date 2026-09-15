@@ -14,8 +14,8 @@ export default function Home() {
 
   // ===== تحديث عنوان التبويب واتجاه التمرير (behavior parity فقط، لا منطق جديد) =====
   useEffect(() => {
-    document.title = 'جمعية خريجي ثانوية المرابطين ببيوكرة — الموقع الرسمي';
-  }, []);
+    document.title = t('siteTitle');
+  }, [t]);
 
   const heroTitle = content['homepage.hero_title'];
   const aboutTitle = content['homepage.about_title'];
@@ -68,7 +68,7 @@ export default function Home() {
       </section>
 
       <svg className="arc-divider" viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M0,0 L1440,0 L1440,40 C1140,80 300,80 0,40 Z" fill="#f7f3ea"></path>
+        <path d="M0,0 L1440,0 L1440,40 C1140,80 300,80 0,40 Z" fill="var(--cream)"></path>
       </svg>
 
       <section id="about">
@@ -157,7 +157,7 @@ export default function Home() {
                 <figure className="gallery-item" key={`${item.image_url}-${i}`}>
                   <img
                     src={safeUrl(item.image_url)}
-                    alt={item.title || item.description || 'صورة من أنشطة الجمعية'}
+                    alt={item.title || item.description || t('a11y.galleryImageAlt')}
                     loading="lazy"
                   />
                   {item.title && <figcaption>{item.title}</figcaption>}
@@ -221,14 +221,14 @@ export default function Home() {
                   <span className="ico">✉</span>
                   <div>
                     <h4>{t('contact.emailLabel')}</h4>
-                    <span><a href={`mailto:${email}`} style={{ color: '#aab6d6' }}>{email}</a></span>
+                    <span><a href={`mailto:${email}`} style={{ color: 'var(--navy-tint-2)' }}>{email}</a></span>
                   </div>
                 </li>
                 <li>
                   <span className="ico">☎</span>
                   <div>
                     <h4>{t('contact.phoneLabel')}</h4>
-                    <span><a href={`tel:${phoneDigits}`} style={{ color: '#aab6d6' }}>{phoneDisplay}</a></span>
+                    <span><a href={`tel:${phoneDigits}`} style={{ color: 'var(--navy-tint-2)' }}>{phoneDisplay}</a></span>
                   </div>
                 </li>
                 <li>
@@ -240,10 +240,10 @@ export default function Home() {
                 </li>
               </ul>
               <div className="social-row">
-                <a href={facebookUrl || '#'} aria-label="فيسبوك">f</a>
-                <a href={instagramUrl || '#'} aria-label="إنستغرام">📷</a>
-                {youtubeUrl && <a href={youtubeUrl} target="_blank" rel="noopener" aria-label="يوتيوب">▶</a>}
-                <a href={`https://wa.me/${whatsappNum}`} target="_blank" rel="noopener" aria-label="واتساب">📱</a>
+                <a href={facebookUrl || '#'} aria-label={t('a11y.facebook')}>f</a>
+                <a href={instagramUrl || '#'} aria-label={t('a11y.instagram')}>📷</a>
+                {youtubeUrl && <a href={youtubeUrl} target="_blank" rel="noopener" aria-label={t('a11y.youtube')}>▶</a>}
+                <a href={`https://wa.me/${whatsappNum}`} target="_blank" rel="noopener" aria-label={t('a11y.whatsapp')}>📱</a>
               </div>
             </div>
             <ContactForm />

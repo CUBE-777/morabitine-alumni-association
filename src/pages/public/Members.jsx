@@ -1,18 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import PeoplePage from './PeoplePage';
 
 export default function Members() {
+  const { t } = useTranslation();
   return (
     <PeoplePage
       listKey="members"
-      title="الأعضاء"
-      description="خريجو ثانوية المرابطين المنخرطون في الجمعية، مع نبذة عن مسار كل واحد منهم."
-      crumbLabel="قائمة الأعضاء"
-      countLabel="عضو"
-      fallbackBadge="عضو"
-      emptyText="سيتم إضافة الأعضاء من لوحة الإدارة قريباً."
+      title={t('peoplePage.membersTitle')}
+      description={t('peoplePage.membersDescription')}
+      crumbLabel={t('peoplePage.membersCrumb')}
+      countLabel={t('peoplePage.membersCountLabel')}
+      fallbackBadge={t('peoplePage.membersBadge')}
+      emptyText={t('peoplePage.membersEmpty')}
       switchHref="/board"
-      switchLabel="عرض المكتب المسير الحالي"
-      searchPlaceholder="ابحث بالاسم أو الجامعة أو سنة التخرج"
+      switchLabel={t('peoplePage.membersSwitch')}
+      searchPlaceholder={t('peoplePage.membersSearch')}
     />
   );
 }

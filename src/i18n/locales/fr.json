@@ -1,182 +1,250 @@
 {
-  "_i18n_status": "PLACEHOLDER — محتوى عربي مؤقت بانتظار الترجمة الفعلية إلى هذه اللغة. راجع تقرير الترحيل.",
   "nav": {
-    "home": "الرئيسية",
-    "about": "من نحن",
-    "activities": "أنشطتنا",
-    "members": "الأعضاء",
-    "gallery": "معرض الصور",
-    "join": "انخرط معنا",
-    "contact": "اتصل بنا"
+    "home": "Accueil",
+    "about": "Qui sommes-nous",
+    "activities": "Nos activités",
+    "members": "Membres",
+    "gallery": "Galerie photos",
+    "join": "Adhérer",
+    "contact": "Contact"
   },
   "brand": {
-    "name": "جمعية خريجي ثانوية المرابطين",
-    "tagline": "خريجون... لكن مهمتنا تستمر"
+    "name": "Association des Lauréats du Lycée Al Mourabitine",
+    "tagline": "Lauréats... mais notre mission continue"
   },
   "hero": {
-    "badge": "🎓 خريجو ثانوية المرابطين ببيوكرة — جيل يبني على جيل",
-    "titlePrefix": "معاً نبني ",
-    "titleEmphasis": "جسرًا بين الأجيال",
-    "titleSuffix": "، من مقاعد الدراسة إلى ميدان العطاء",
-    "description": "جمعية تجمع خريجي ثانوية المرابطين للحفاظ على أواصر الأخوة، ورد الجميل لمدرستنا، ودعم أجيال التلاميذ القادمة.",
-    "ctaJoin": "انخرط معنا",
-    "ctaActivities": "اكتشف أنشطتنا"
+    "badge": "🎓 Lauréats du lycée Al Mourabitine de Biougra — une génération au service de la suivante",
+    "titlePrefix": "Ensemble, construisons ",
+    "titleEmphasis": "un pont entre les générations",
+    "titleSuffix": ", des bancs de l'école au terrain de l'engagement",
+    "description": "Une association qui réunit les lauréats du lycée Al Mourabitine pour préserver les liens de fraternité, rendre hommage à notre école et accompagner les générations d'élèves à venir.",
+    "ctaJoin": "Adhérer",
+    "ctaActivities": "Découvrir nos activités"
   },
   "about": {
-    "eyebrow": "من نحن",
-    "title": "قصة جيل يعود ليمد يد العون",
-    "p1": "تأسست <strong>جمعية خريجي ثانوية المرابطين</strong> برغبة صادقة من مجموعة من الخريجين في الحفاظ على الرابطة التي جمعتهم يوماً على مقاعد الدراسة، وتحويلها إلى عمل جمعوي حقيقي يخدم المدرسة والمجتمع المحلي.",
-    "p2": "نؤمن بأن التعليم جسرٌ يُبنى جيلاً بعد جيل، ولذلك نعمل على <strong>جمع شمل الخريجين</strong>، وخلق فضاءات للتواصل والتعاون، ودعم التلاميذ الحاليين بكل ما يملكه الخريجون من خبرة وتجربة.",
+    "eyebrow": "Qui sommes-nous",
+    "title": "L'histoire d'une génération qui tend la main",
+    "p1": "L'<strong>Association des Lauréats du Lycée Al Mourabitine</strong> a été fondée par un groupe de lauréats désireux de préserver le lien qui les unissait sur les bancs de l'école, et de le transformer en une véritable action associative au service de l'établissement et de la communauté locale.",
+    "p2": "Nous croyons que l'éducation est un pont qui se construit génération après génération. C'est pourquoi nous œuvrons à <strong>rassembler les lauréats</strong>, à créer des espaces d'échange et de coopération, et à accompagner les élèves actuels grâce à l'expérience de leurs aînés.",
     "pillars": [
       {
-        "num": "١",
-        "title": "التواصل",
-        "desc": "لمّ شمل خريجي الثانوية عبر مختلف الأجيال والدفعات."
+        "num": "1",
+        "title": "Le lien",
+        "desc": "Rassembler les lauréats du lycée, toutes générations et promotions confondues."
       },
       {
-        "num": "٢",
-        "title": "الدعم",
-        "desc": "مواكبة التلاميذ الحاليين علمياً واجتماعياً كلما أمكن ذلك."
+        "num": "2",
+        "title": "Le soutien",
+        "desc": "Accompagner les élèves actuels sur le plan scolaire et social, autant que possible."
       },
       {
-        "num": "٣",
-        "title": "التكوين",
-        "desc": "تنظيم لقاءات وورشات يستفيد منها الخريجون والتلاميذ معاً."
+        "num": "3",
+        "title": "La formation",
+        "desc": "Organiser des rencontres et ateliers au bénéfice des lauréats comme des élèves."
       },
       {
-        "num": "٤",
-        "title": "التطوع",
-        "desc": "الانخراط في مبادرات تضامنية تخدم المدرسة والحي المحيط بها."
+        "num": "4",
+        "title": "Le bénévolat",
+        "desc": "S'engager dans des initiatives solidaires au service de l'école et du quartier."
       }
     ]
   },
   "activities": {
-    "eyebrow": "أنشطتنا ومشاريعنا",
-    "title": "ما نقوم به على أرض الواقع",
-    "description": "مجموعة من الأنشطة والمشاريع التي تجسد رسالة الجمعية، قابلة للتطور والإضافة مع نمو عمل الجمعية.",
-    "viewDetails": "عرض التفاصيل ←",
+    "eyebrow": "Nos activités et projets",
+    "title": "Ce que nous faisons concrètement",
+    "description": "Un ensemble d'activités et de projets qui incarnent la mission de l'association, appelé à évoluer et à s'enrichir au fil de notre action.",
+    "viewDetails": "Voir les détails ←",
     "fallback": [
       {
         "icon": "🤝",
-        "title": "لقاء الخريجين السنوي",
-        "desc": "لقاء دوري يجمع خريجي مختلف الدفعات لتجديد الصلة وتبادل الأخبار والتجارب.",
+        "title": "Rencontre annuelle des lauréats",
+        "desc": "Une rencontre périodique qui réunit les lauréats de différentes promotions pour renouer le contact et échanger souvenirs et expériences.",
         "slug": "annual-meeting"
       },
       {
         "icon": "📚",
-        "title": "برنامج المواكبة الدراسية",
-        "desc": "مبادرة لدعم التلاميذ الحاليين عبر حصص توجيه ومساعدة في المواد الأساسية.",
+        "title": "Programme de soutien scolaire",
+        "desc": "Une initiative pour accompagner les élèves actuels à travers des séances d'orientation et d'aide dans les matières fondamentales.",
         "slug": "study-mentorship"
       },
       {
         "icon": "🎒",
-        "title": "دعم التلاميذ المحتاجين",
-        "desc": "مساهمات وتبرعات عينية لتوفير الأدوات واللوازم المدرسية عند الحاجة.",
+        "title": "Soutien aux élèves dans le besoin",
+        "desc": "Contributions et dons en nature pour fournir fournitures et matériel scolaire en cas de besoin.",
         "slug": "student-support"
       },
       {
         "icon": "🌱",
-        "title": "مبادرات تطوعية",
-        "desc": "حملات تحسيسية وتطوعية داخل المؤسسة وفي الحي، بمشاركة الخريجين والتلاميذ.",
+        "title": "Initiatives bénévoles",
+        "desc": "Campagnes de sensibilisation et actions bénévoles au sein de l'établissement et dans le quartier, avec la participation des lauréats et des élèves.",
         "slug": "volunteer-initiatives"
       }
     ]
   },
   "members": {
-    "eyebrow": "أعضاؤنا",
-    "title": "تعرف على أعضاء الجمعية",
-    "description": "اطّلع على المكتب المسير الحالي، أو تصفّح قائمة المنخرطين.",
-    "boardEyebrow": "القيادة",
-    "boardTitle": "المكتب المسير الحالي",
-    "boardDesc": "تعرّف على الأعضاء المكلفين بتسيير الجمعية وتنفيذ قراراتها.",
-    "boardCta": "عرض المكتب ←",
-    "membersEyebrow": "المنخرطون",
-    "membersTitle": "الأعضاء",
-    "membersDesc": "قائمة خريجي الثانوية المنخرطين في رسالة الجمعية وأنشطتها.",
-    "membersCta": "عرض الأعضاء ←"
+    "eyebrow": "Nos membres",
+    "title": "Découvrez les membres de l'association",
+    "description": "Consultez le bureau exécutif actuel, ou parcourez la liste des adhérents.",
+    "boardEyebrow": "La direction",
+    "boardTitle": "Le bureau exécutif actuel",
+    "boardDesc": "Découvrez les membres chargés de diriger l'association et d'exécuter ses décisions.",
+    "boardCta": "Voir le bureau ←",
+    "membersEyebrow": "Les adhérents",
+    "membersTitle": "Membres",
+    "membersDesc": "Liste des lauréats du lycée adhérents à la mission de l'association et à ses activités.",
+    "membersCta": "Voir les membres ←"
   },
   "gallery": {
-    "eyebrow": "لحظات من مسيرتنا",
-    "title": "معرض الصور",
-    "description": "صور من أنشطة وفعاليات الجمعية، يتم تحديثها بشكل دوري.",
-    "empty": "سيتم إضافة صور الأنشطة هنا قريباً."
+    "eyebrow": "Moments de notre parcours",
+    "title": "Galerie photos",
+    "description": "Photos des activités et événements de l'association, mises à jour régulièrement.",
+    "empty": "Les photos des activités seront bientôt ajoutées ici."
   },
   "join": {
-    "eyebrow": "شارك معنا",
-    "title": "كن جزءاً من القصة",
-    "description": "سواء بوقتك أو بخبرتك أو بدعمك، كل مساهمة تصنع فرقاً في مسار تلميذ اليوم.",
-    "membershipEyebrow": "العضوية",
-    "membershipTitle": "كن عضواً في الجمعية",
-    "membershipDesc": "انضم إلى شبكة خريجي الثانوية وساهم في أنشطتها وقراراتها.",
+    "eyebrow": "Rejoignez-nous",
+    "title": "Faites partie de l'histoire",
+    "description": "Que ce soit par votre temps, votre expérience ou votre soutien, chaque contribution fait une différence dans le parcours d'un élève d'aujourd'hui.",
+    "membershipEyebrow": "Adhésion",
+    "membershipTitle": "Devenez membre de l'association",
+    "membershipDesc": "Rejoignez le réseau des lauréats du lycée et contribuez à ses activités et à ses décisions.",
     "membershipList": [
-      "المشاركة في اجتماعات الجمعية وأنشطتها",
-      "التواصل مع خريجي مختلف الدفعات",
-      "فرصة للمساهمة في التوجيه والتخطيط"
+      "Participer aux réunions et activités de l'association",
+      "Échanger avec les lauréats des différentes promotions",
+      "Contribuer à l'orientation et à la planification"
     ],
     "form": {
-      "name": "الاسم الكامل",
-      "namePlaceholder": "اكتب اسمك",
-      "phone": "رقم الهاتف",
+      "name": "Nom complet",
+      "namePlaceholder": "Entrez votre nom",
+      "phone": "Numéro de téléphone",
       "phonePlaceholder": "06 XX XX XX XX",
-      "email": "البريد الإلكتروني",
-      "emailPlaceholder": "example@email.com",
-      "promo": "دفعة التخرج",
-      "promoPlaceholder": "مثال: 2015",
-      "track": "الشعبة",
-      "trackPlaceholder": "اختر شعبتك",
+      "email": "Adresse e-mail",
+      "emailPlaceholder": "exemple@email.com",
+      "promo": "Promotion",
+      "promoPlaceholder": "Exemple : 2015",
+      "track": "Filière",
+      "trackPlaceholder": "Choisissez votre filière",
       "tracks": [
-        "علوم تجريبية",
-        "علوم رياضية",
-        "آداب وعلوم إنسانية",
-        "اقتصاد وتدبير",
-        "علوم شرعية",
-        "أخرى"
+        "Sciences expérimentales",
+        "Sciences mathématiques",
+        "Lettres et sciences humaines",
+        "Économie et gestion",
+        "Sciences religieuses",
+        "Autre"
       ],
-      "message": "لماذا تريد الانضمام؟ (اختياري)",
-      "messagePlaceholder": "اكتب رسالة قصيرة...",
-      "submit": "إرسال طلب الانخراط",
-      "submitting": "جاري الإرسال...",
-      "error": "تعذر إرسال الطلب، تحقق من اتصالك بالإنترنت وحاول مرة أخرى."
+      "message": "Pourquoi souhaitez-vous nous rejoindre ? (optionnel)",
+      "messagePlaceholder": "Écrivez un court message...",
+      "submit": "Envoyer la demande d'adhésion",
+      "submitting": "Envoi en cours...",
+      "error": "Impossible d'envoyer la demande. Vérifiez votre connexion internet et réessayez."
     },
-    "donateEyebrow": "التبرع",
-    "donateTitle": "ادعم مشاريع الجمعية",
-    "donateDesc": "تبرعك، مهما كان حجمه، يساهم مباشرة في دعم التلاميذ ومشاريع المدرسة.",
+    "donateEyebrow": "Faire un don",
+    "donateTitle": "Soutenez les projets de l'association",
+    "donateDesc": "Votre don, quel que soit son montant, contribue directement au soutien des élèves et des projets de l'école.",
     "donateList": [
-      "دعم اللوازم المدرسية للمحتاجين",
-      "تمويل برامج المواكبة الدراسية",
-      "المساهمة في الأنشطة والفعاليات"
+      "Soutien aux fournitures scolaires pour les élèves dans le besoin",
+      "Financement des programmes de soutien scolaire",
+      "Contribution aux activités et événements"
     ],
-    "donateCta": "تواصل للتبرع",
-    "donateWhatsappText": "السلام عليكم، أرغب في التبرع لدعم مشاريع الجمعية"
+    "donateCta": "Contactez-nous pour un don",
+    "donateWhatsappText": "Bonjour, je souhaite faire un don pour soutenir les projets de l'association"
   },
   "contact": {
-    "eyebrow": "اتصل بنا",
-    "title": "نسعد بتواصلكم معنا",
-    "emailLabel": "البريد الإلكتروني",
-    "phoneLabel": "الهاتف",
-    "addressLabel": "العنوان",
+    "eyebrow": "Contact",
+    "title": "Nous serions ravis de vous entendre",
+    "emailLabel": "Adresse e-mail",
+    "phoneLabel": "Téléphone",
+    "addressLabel": "Adresse",
     "defaultEmail": "a.laureats.almourabitine@gmail.com",
     "defaultPhone": "+212 679 672 284",
-    "defaultAddress": "الثانوية التأهيلية المرابطين، بيوكرة، اشتوكة آيت باها",
+    "defaultAddress": "Lycée qualifiant Al Mourabitine, Biougra, Chtouka Aït Baha",
     "form": {
-      "name": "الاسم الكامل",
-      "namePlaceholder": "اكتب اسمك",
-      "promo": "دفعة التخرج (اختياري)",
-      "promoPlaceholder": "مثال: 2015",
-      "email": "البريد الإلكتروني",
-      "emailPlaceholder": "example@email.com",
-      "message": "رسالتك",
-      "messagePlaceholder": "اكتب رسالتك هنا...",
-      "submit": "إرسال الرسالة",
-      "note": "ستصلنا رسالتك مباشرة، وسنتواصل معك عبر بريدك الإلكتروني."
+      "name": "Nom complet",
+      "namePlaceholder": "Entrez votre nom",
+      "promo": "Promotion (optionnel)",
+      "promoPlaceholder": "Exemple : 2015",
+      "email": "Adresse e-mail",
+      "emailPlaceholder": "exemple@email.com",
+      "message": "Votre message",
+      "messagePlaceholder": "Écrivez votre message ici...",
+      "submit": "Envoyer le message",
+      "note": "Votre message nous parviendra directement, et nous vous répondrons par e-mail."
     }
   },
   "footer": {
-    "copyright": "© 2026 جمعية خريجي ثانوية المرابطين. جميع الحقوق محفوظة."
+    "copyright": "© 2026 Association des Lauréats du Lycée Al Mourabitine. Tous droits réservés."
+  },
+  "common": {
+    "detailsLink": "Détails ←",
+    "closeAnnouncement": "Fermer l'annonce"
+  },
+  "activityPage": {
+    "activitiesCrumb": "Nos activités",
+    "detailsCrumbFallback": "Détails de l'activité",
+    "loadingTitle": "Chargement des détails de l'activité...",
+    "dateFallback": "Date de l'activité",
+    "locationFallback": "Lieu",
+    "categoryFallback": "Catégorie",
+    "imageAlt": "Image de l'activité",
+    "aboutTitle": "À propos de cette activité",
+    "loadingBody": "Chargement des détails et de l'objectif de l'activité...",
+    "achievementsTitle": "Réalisations et projets accomplis :",
+    "extraInfoTitle": "Informations complémentaires",
+    "dateTimeLabel": "Date et heure",
+    "locationLabel": "Lieu de déroulement",
+    "beneficiariesLabel": "Bénéficiaires",
+    "beneficiariesFallback": "Élèves et lauréats du lycée",
+    "joinCta": "Participer ou adhérer",
+    "shareCta": "Partager l'activité 🔗",
+    "linkCopied": "Le lien de la page a été copié avec succès !"
+  },
+  "thankYou": {
+    "title": "Merci de nous avoir contactés",
+    "message": "Votre message a bien été reçu. Nous vous répondrons par e-mail dans les plus brefs délais.",
+    "backHome": "Retour à l'accueil"
+  },
+  "notFound": {
+    "crumb": "Page introuvable",
+    "heroTitle": "404 — Page introuvable",
+    "title": "Désolé, cette page est introuvable",
+    "message": "Le lien que vous avez suivi n'existe pas, a été déplacé, ou n'est plus disponible. Vérifiez l'adresse ou revenez à l'accueil.",
+    "backHome": "Retour à l'accueil",
+    "browseMembers": "Parcourir les membres"
   },
   "languageSwitcher": {
     "ar": "العربية",
     "fr": "Français",
     "en": "English"
-  }
+  },
+  "peoplePage": {
+    "loading": "Chargement de la liste des membres...",
+    "noResults": "Aucun résultat ne correspond à votre recherche.",
+    "resultsCount": "{{count}} résultat(s) sur {{total}}",
+    "membersTitle": "Membres",
+    "membersDescription": "Les lauréats du lycée Al Mourabitine adhérents à l'association, avec un aperçu du parcours de chacun.",
+    "membersCrumb": "Liste des membres",
+    "membersCountLabel": "membre(s)",
+    "membersBadge": "Membre",
+    "membersEmpty": "Les membres seront bientôt ajoutés depuis le tableau de bord.",
+    "membersSwitch": "Voir le bureau exécutif actuel",
+    "membersSearch": "Rechercher par nom, université ou année de promotion",
+    "boardTitle": "Le bureau exécutif actuel",
+    "boardDescription": "Les membres chargés de diriger l'association et d'exécuter ses décisions, mis à jour depuis le tableau de bord.",
+    "boardCrumb": "Bureau exécutif",
+    "boardCountLabel": "membre(s) du bureau",
+    "boardBadge": "Bureau exécutif",
+    "boardEmpty": "Les membres du bureau seront bientôt ajoutés depuis le tableau de bord.",
+    "boardSwitch": "Voir la liste des membres",
+    "boardSearch": "Rechercher parmi les membres du bureau"
+  },
+  "a11y": {
+    "logoAlt": "Logo de l'association",
+    "logoAltFull": "Logo de l'Association des Lauréats du Lycée Al Mourabitine",
+    "openMenu": "Ouvrir le menu",
+    "galleryImageAlt": "Photo des activités de l'association",
+    "facebook": "Facebook",
+    "instagram": "Instagram",
+    "youtube": "YouTube",
+    "whatsapp": "WhatsApp"
+  },
+  "siteTitle": "Association des Lauréats du Lycée Al Mourabitine, Biougra — Site officiel"
 }

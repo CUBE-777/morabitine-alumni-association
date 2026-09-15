@@ -21,13 +21,13 @@ export default function InteriorHeader() {
     <header className="static-header">
       <div className="container">
         <Link to="/" className="brand">
-          <img src="/logo.jpg" alt="شعار جمعية خريجي ثانوية المرابطين" />
+          <img src="/logo.jpg" alt={t('a11y.logoAltFull')} />
           <div className="brand-text">
             {t('brand.name')}
             <span>{t('brand.tagline')}</span>
           </div>
         </Link>
-        <button className="nav-toggle" aria-label="فتح القائمة" onClick={() => setNavOpen((v) => !v)}>
+        <button className="nav-toggle" aria-label={t('a11y.openMenu')} onClick={() => setNavOpen((v) => !v)}>
           <span></span>
           <span></span>
           <span></span>

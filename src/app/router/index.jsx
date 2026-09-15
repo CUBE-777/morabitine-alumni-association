@@ -4,6 +4,7 @@ import Members from '../../pages/public/Members';
 import Board from '../../pages/public/Board';
 import Activity from '../../pages/public/Activity';
 import ThankYou from '../../pages/public/ThankYou';
+import NotFound from '../../pages/public/NotFound';
 import Login from '../../pages/admin/Login';
 import Dashboard from '../../pages/admin/Dashboard';
 import Requests from '../../pages/admin/Requests';
@@ -49,5 +50,9 @@ export const router = createBrowserRouter([
   { path: '/admin/admins', element: protectedAdmin(['super_admin'], <AdminUsers />) },
   { path: '/admin/audit', element: protectedAdmin(['super_admin'], <Audit />) },
   { path: '/admin/settings', element: protectedAdmin(['super_admin'], <Settings />) },
+
+  // Phase 28 — Fallback 404: أي مسار غير معرّف أعلاه (عام أو إداري) يعرض صفحة
+  // 404 احترافية بدل شاشة بيضاء فارغة أو خطأ React Router.
+  { path: '*', element: <NotFound /> },
 ]);
 

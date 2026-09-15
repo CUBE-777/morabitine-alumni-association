@@ -1,18 +1,20 @@
+import { useTranslation } from 'react-i18next';
 import PeoplePage from './PeoplePage';
 
 export default function Board() {
+  const { t } = useTranslation();
   return (
     <PeoplePage
       listKey="board"
-      title="المكتب المسير الحالي"
-      description="الأعضاء المكلفون بتسيير الجمعية وتنفيذ قراراتها، كما يُحدَّثون من لوحة الإدارة."
-      crumbLabel="المكتب المسير"
-      countLabel="عضو مكتب"
-      fallbackBadge="المكتب المسير"
-      emptyText="سيتم إضافة أعضاء المكتب المسير من لوحة الإدارة قريباً."
+      title={t('peoplePage.boardTitle')}
+      description={t('peoplePage.boardDescription')}
+      crumbLabel={t('peoplePage.boardCrumb')}
+      countLabel={t('peoplePage.boardCountLabel')}
+      fallbackBadge={t('peoplePage.boardBadge')}
+      emptyText={t('peoplePage.boardEmpty')}
       switchHref="/members"
-      switchLabel="عرض قائمة الأعضاء"
-      searchPlaceholder="البحث في أعضاء المكتب المسير"
+      switchLabel={t('peoplePage.boardSwitch')}
+      searchPlaceholder={t('peoplePage.boardSearch')}
     />
   );
 }

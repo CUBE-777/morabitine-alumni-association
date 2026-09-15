@@ -19,15 +19,55 @@
 
   /* ===== ألوان إضافية من admin.css (تُستخدم أيضًا في حالات الموقع العام: نجاح/خطأ) ===== */
   --danger: #b3261e;
+  --danger-soft: #fbe7e6;
+  --danger-bright: #f28b84;
   --success: #1f7a4d;
+  --success-bright: #3ddc84;
   --border: #e9e3d5;
+  --border-soft: #eee6d6;
+
+  /* ===== درجات إضافية للألوان الأساسية (Phase 4 — Design System)
+     مستخرجة من الاستخدام الفعلي المتكرر عبر ملفات public-home/people/
+     interior-page/activity-page بدل تركها قيمًا hex مبعثرة. ليست ألوانًا
+     جديدة، بل تسمية لقيم كانت مستخدمة فعليًا بدون توحيد. ===== */
+  --gold-deep: #c9791f;
+  --gold-text: #b77812;
+  --muted-light: #8a94aa;
+  --cream-dark: #d8cfb8;
+  --navy-tint-1: #c9d3ea;
+  --navy-tint-2: #aab6d6;
+  --navy-tint-3: #7c88a8;
+
+  /* ===== لون semantic ثانوي (بنفسجي) يُستخدم حصرًا لوسم "الجامعة" في بطاقات
+     الأعضاء — وُجد كقيمة hex غير موثقة، هوية بصرية مقصودة (ليست جزءًا من
+     الهوية الأساسية Navy/Gold) لذلك أُبقي عليه كتوكن منفصل وواضح الاسم بدل
+     حذفه أو خلطه بألوان العلامة. ===== */
+  --accent-purple: #7046a3;
+  --accent-purple-soft: #f1eaff;
+
+  /* ===== نسخ RGB (بدون #) للألوان الأساسية الأكثر استخدامًا داخل rgba(),
+     لتفادي تكرار نفس القيم الرقمية (242, 169, 59 مثلاً) في عشرات الأماكن
+     كأرقام خام غير مرتبطة بأي توكن. لا تُستخدم بمفردها؛ فقط داخل
+     rgba(var(--gold-rgb), OPACITY). ===== */
+  --gold-rgb: 242, 169, 59;
+  --white-rgb: 255, 255, 255;
+  --navy-deep-rgb: 8, 22, 51;
+  --danger-rgb: 179, 38, 30;
 
   /* ===== قياسات عامة ===== */
   --sidebar-w: 260px;
   --radius-sm: 8px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --radius-xl: 24px;
+  --radius-full: 999px;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.16);
+  --shadow-xl: 0 24px 56px rgba(0, 0, 0, 0.2);
+  /* اسم قديم أُبقي عليه للتوافق مع الاستخدام الحالي (يساوي --shadow-md) —
+     الملفات الجديدة يجب أن تستخدم --shadow-md مباشرة. */
+  --shadow-soft: var(--shadow-md);
   --transition-base: 0.25s ease;
 
   /* ===== نظام تباعد موحّد للموقع العام (Phase 2 — طبّق بدل القيم المبعثرة) =====
@@ -39,6 +79,42 @@
   --gap-lg: 60px;
   --gap-md: 24px;
   --gap-sm: 18px;
+
+  /* ===== سلّم تباعد عام (4px base) لاستخدامه في مكونات جديدة (بطاقات، نماذج،
+     أزرار...) بدل قيم px عشوائية. container/section/gap أعلاه تبقى كما هي
+     لأنها مضبوطة بصريًا بعناية لأقسام الصفحة الرئيسية. ===== */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ===== Typography scale — موثّقة من القيم الفعلية الأكثر شيوعًا في الموقع
+     (Tajawal للنصوص، Amiri للعناوين الاحتفالية). التوثيق فقط في هذه المرحلة:
+     العناوين الحالية في كل صفحة تحتفظ بقيمها الحالية (لا تغيير بصري)، وهذا
+     السلّم مرجع لأي مكوّن جديد بدل اختراع حجم عشوائي. ===== */
+  --font-body: 'Tajawal', sans-serif;
+  --font-display: 'Amiri', serif;
+
+  --text-caption: 0.72rem;
+  --text-small: 0.82rem;
+  --text-body: 0.95rem;
+  --text-body-lg: 1.05rem;
+  --text-h4: 1.3rem;
+  --text-h3: 1.6rem;
+  --text-h2: 2.2rem;
+  --text-h1: 2.8rem;
+  --text-display: 3.4rem;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.8;
 }
 
 /* ===== لوحة الإدارة (Admin) — Dark-first، SaaS Control Center =====
@@ -48,10 +124,10 @@
   --admin-bg: #060c1c;
   --admin-surface: #0d1730;
   --admin-surface-alt: #101d3d;
-  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-border: rgba(var(--white-rgb), 0.08);
   --admin-text: #e7ecfb;
   --admin-text-muted: #8f9bc4;
   --admin-accent: var(--gold);
-  --admin-accent-soft: rgba(242, 169, 59, 0.14);
-  --admin-glow: 0 0 0 1px rgba(242, 169, 59, 0.12), 0 12px 40px rgba(8, 22, 51, 0.55);
+  --admin-accent-soft: rgba(var(--gold-rgb), 0.14);
+  --admin-glow: 0 0 0 1px rgba(var(--gold-rgb), 0.12), 0 12px 40px rgba(var(--navy-deep-rgb), 0.55);
 }

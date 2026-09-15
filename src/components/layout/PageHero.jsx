@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function PageHero({ crumbs, title, description }) {
+  const { t } = useTranslation();
   return (
     <section className="page-hero">
       <div className="container">
         <div className="breadcrumbs">
-          <Link to="/">الرئيسية</Link>
+          <Link to="/">{t('nav.home')}</Link>
           {crumbs.map((crumb) => (
             <span key={crumb.label} style={{ display: 'contents' }}>
               <span>‹</span>

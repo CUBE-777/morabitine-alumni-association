@@ -6,7 +6,7 @@ export default function InteriorFooter() {
     <footer className="interior-footer">
       <div className="container">
         <div className="brand">
-          <img src="/logo.jpg" alt="شعار الجمعية" style={{ width: 38, height: 38, borderRadius: 8 }} />
+          <img src="/logo.jpg" alt={t('a11y.logoAlt')} style={{ width: 38, height: 38, borderRadius: 8 }} />
           <div className="brand-text" style={{ color: 'var(--white)' }}>
             {t('brand.name')}
           </div>

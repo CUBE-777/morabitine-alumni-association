@@ -27,7 +27,7 @@ export default function Header({ brandName }) {
     <header id="site-header" className={scrolled ? 'scrolled' : ''}>
       <div className="container">
         <a href="#home" className="brand">
-          <img src="/logo.jpg" alt="شعار جمعية خريجي ثانوية المرابطين" />
+          <img src="/logo.jpg" alt={t('a11y.logoAltFull')} />
           <div className="brand-text">
             {brandName || t('brand.name')}
             <span>{t('brand.tagline')}</span>
@@ -35,7 +35,7 @@ export default function Header({ brandName }) {
         </a>
         <button
           className="nav-toggle"
-          aria-label="فتح القائمة"
+          aria-label={t('a11y.openMenu')}
           onClick={() => setNavOpen((v) => !v)}
         >
           <span></span>

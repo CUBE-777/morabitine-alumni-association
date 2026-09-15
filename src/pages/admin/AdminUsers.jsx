@@ -54,7 +54,7 @@ export default function AdminUsers() {
       />
 
       <div className="admin-panel" style={{ background: 'rgba(31,122,77,.08)', borderColor: 'rgba(31,122,77,.3)' }}>
-        <p style={{ fontSize: '.86rem', color: '#3ddc84', margin: 0 }}>
+        <p style={{ fontSize: '.86rem', color: 'var(--success-bright)', margin: 0 }}>
           إنشاء مسؤول جديد يتم بالكامل من هنا: نُنشئ حساب الدخول تلقائيًا على الخادم (Supabase Edge Function) ونرسل
           للمستخدم الجديد رابطًا لضبط كلمة مروره. لا حاجة لنسخ أي UUID يدويًا من Supabase Dashboard.
         </p>
