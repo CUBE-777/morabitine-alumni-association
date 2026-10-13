@@ -1,401 +1,207 @@
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+/**
+ * activity-page.css
+ * تنسيقات صفحة النشاط وصفحة الإعلان فقط.
+ * أُزيلت منه القواعد العامة (* / html / body / h1-h3 / a / .container / header / .brand /
+ * nav / .nav-toggle / footer / .copyright / .btn) لأنها كانت تتسرّب إلى كل الصفحات
+ * (تجعل header = position:fixed داخل .fixed-top-stack فيُقاس ارتفاعه خطأً، وتجعل .btn بعرض 100%).
+ * هذه القواعد موجودة أصلًا في public-home.css و interior-page.css.
+ */
 
-        html {
-            scroll-behavior: smooth;
-        }
+/* ===== HERO BANNER ===== */
+.activity-hero {
+  background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+  padding: 150px 0 60px;
+  color: var(--white);
+  position: relative;
+}
 
-        body {
-            font-family: 'Tajawal', sans-serif;
-            color: var(--ink);
-            background: var(--cream);
-            line-height: 1.7;
-            overflow-x: hidden;
-        }
+.activity-hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.3;
+  margin-bottom: 16px;
+  color: var(--white);
+}
 
-        h1,
-        h2,
-        h3,
-        .display {
-            font-family: 'Amiri', serif;
-            font-weight: 700;
-        }
+.activity-meta-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(var(--white-rgb), 0.1);
+  border: 1px solid rgba(var(--white-rgb), 0.18);
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-size: 0.88rem;
+  color: var(--navy-tint-1);
+}
 
-        .container {
-            max-width: 1140px;
-            margin: 0 auto;
-            padding: 0 28px;
-        }
+/* ===== CONTENT LAYOUT ===== */
+.activity-detail-section {
+  padding: 60px 0 100px;
+}
 
-        /* ===== HEADER ===== */
-        header {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            z-index: 100;
-            padding: 16px 0;
-            background: rgba(var(--navy-deep-rgb), 0.95);
-            backdrop-filter: blur(8px);
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-            transition: padding .35s ease;
-        }
+.activity-layout {
+  display: grid;
+  grid-template-columns: 2.2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
 
-        header .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+.main-card {
+  background: var(--white);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  padding: 36px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+.featured-image-container {
+  width: 100%;
+  height: 380px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 28px;
+  background: var(--border);
+}
 
-        .brand img {
-            width: 46px;
-            height: 46px;
-            border-radius: 10px;
-        }
+.featured-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-        .brand-text {
-            color: var(--white);
-            font-family: 'Amiri', serif;
-            font-weight: 700;
-            font-size: 1.05rem;
-            line-height: 1.3;
-        }
+.activity-body {
+  color: var(--ink);
+  font-size: 1.05rem;
+  line-height: 1.85;
+}
 
-        .brand-text span {
-            display: block;
-            font-family: 'Tajawal', sans-serif;
-            font-weight: 400;
-            font-size: 0.72rem;
-            color: var(--gold-light);
-            letter-spacing: 0.05em;
-        }
+.activity-body h3 {
+  font-size: 1.4rem;
+  color: var(--navy-deep);
+  margin: 28px 0 14px;
+}
 
-        nav ul {
-            display: flex;
-            gap: 34px;
-            list-style: none;
-        }
+.activity-body p {
+  margin-bottom: 18px;
+  color: var(--muted);
+}
 
-        nav a {
-            color: var(--white);
-            font-size: 0.95rem;
-            font-weight: 500;
-            position: relative;
-            padding: 6px 0;
-        }
+.activity-body ul {
+  margin: 16px 0 24px 20px;
+  list-style: disc;
+  color: var(--muted);
+  padding-right: 20px;
+}
 
-        nav a::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 0%;
-            height: 2px;
-            background: var(--gold);
-            transition: width .3s ease;
-        }
+.activity-body li {
+  margin-bottom: 8px;
+}
 
-        nav a:hover::after {
-            width: 100%;
-        }
+/* ===== SIDEBAR ===== */
+.sidebar-card {
+  background: var(--white);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  padding: 28px;
+  position: sticky;
+  top: 100px;
+}
 
-        .nav-toggle {
-            display: none;
-        }
+.sidebar-card h3 {
+  font-size: 1.25rem;
+  color: var(--navy-deep);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid var(--cream);
+}
 
-        /* ===== HERO BANNER ===== */
-        .activity-hero {
-            background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 45%, var(--navy-deep) 100%);
-            padding: 150px 0 60px;
-            color: var(--white);
-            position: relative;
-        }
+.info-list {
+  list-style: none;
+  margin-bottom: 24px;
+}
 
-        .breadcrumbs {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.88rem;
-            color: var(--gold-light);
-            margin-bottom: 20px;
-        }
+.info-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
 
-        .breadcrumbs a {
-            color: var(--navy-tint-2);
-            transition: color .2s ease;
-        }
+.info-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(var(--gold-rgb), 0.15);
+  color: var(--navy-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
 
-        .breadcrumbs a:hover {
-            color: var(--gold);
-        }
+.info-text label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
 
-        .activity-hero h1 {
-            font-size: clamp(2rem, 4vw, 3rem);
-            line-height: 1.3;
-            margin-bottom: 16px;
-            color: var(--white);
-        }
+.info-text span {
+  font-weight: 700;
+  color: var(--navy-deep);
+  font-size: 0.95rem;
+}
 
-        .activity-meta-pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 18px;
-        }
+/* ===== أزرار خاصة بهذه الصفحات (بدون التأثير على .btn العامة) ===== */
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--navy-deep);
+  color: var(--navy-deep);
+}
 
-        .meta-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(var(--white-rgb), 0.1);
-            border: 1px solid rgba(var(--white-rgb), 0.18);
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 0.88rem;
-            color: var(--navy-tint-1);
-        }
+.btn-outline:hover {
+  background: var(--navy-deep);
+  color: var(--white);
+}
 
-        /* ===== CONTENT LAYOUT ===== */
-        .activity-detail-section {
-            padding: 60px 0 100px;
-        }
+button.btn {
+  cursor: pointer;
+  font-family: inherit;
+}
 
-        .activity-layout {
-            display: grid;
-            grid-template-columns: 2.2fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
+.sidebar-card .btn {
+  width: 100%;
+  justify-content: center;
+  padding: 13px 20px;
+  font-size: 0.95rem;
+}
 
-        .main-card {
-            background: var(--white);
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            padding: 36px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-        }
+.sidebar-card .btn-gold {
+  box-shadow: 0 4px 14px rgba(var(--gold-rgb), 0.3);
+}
 
-        .featured-image-container {
-            width: 100%;
-            height: 380px;
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 28px;
-            background: var(--border);
-        }
+.sidebar-card .btn-gold:hover {
+  box-shadow: 0 8px 20px rgba(var(--gold-rgb), 0.4);
+}
 
-        .featured-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.sidebar-card .btn-outline {
+  margin-top: 10px;
+}
 
-        .activity-body {
-            color: var(--ink);
-            font-size: 1.05rem;
-            line-height: 1.85;
-        }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 860px) {
+  .activity-layout {
+    grid-template-columns: 1fr;
+  }
 
-        .activity-body h3 {
-            font-size: 1.4rem;
-            color: var(--navy-deep);
-            margin: 28px 0 14px;
-        }
-
-        .activity-body p {
-            margin-bottom: 18px;
-            color: var(--muted);
-        }
-
-        .activity-body ul {
-            margin: 16px 0 24px 20px;
-            list-style: disc;
-            color: var(--muted);
-            padding-right: 20px;
-        }
-
-        .activity-body li {
-            margin-bottom: 8px;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar-card {
-            background: var(--white);
-            border-radius: 18px;
-            border: 1px solid var(--border);
-            padding: 28px;
-            position: sticky;
-            top: 100px;
-        }
-
-        .sidebar-card h3 {
-            font-size: 1.25rem;
-            color: var(--navy-deep);
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--cream);
-        }
-
-        .info-list {
-            list-style: none;
-            margin-bottom: 24px;
-        }
-
-        .info-list li {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 18px;
-        }
-
-        .info-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: rgba(var(--gold-rgb), 0.15);
-            color: var(--navy-deep);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            flex-shrink: 0;
-        }
-
-        .info-text label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--muted);
-        }
-
-        .info-text span {
-            font-weight: 700;
-            color: var(--navy-deep);
-            font-size: 0.95rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            padding: 13px 20px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.95rem;
-            transition: all .25s ease;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-gold {
-            background: var(--gold);
-            color: var(--navy-deep);
-            box-shadow: 0 4px 14px rgba(var(--gold-rgb), 0.3);
-        }
-
-        .btn-gold:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(var(--gold-rgb), 0.4);
-        }
-
-        .btn-outline {
-            background: transparent;
-            border: 1px solid var(--navy-deep);
-            color: var(--navy-deep);
-            margin-top: 10px;
-        }
-
-        .btn-outline:hover {
-            background: var(--navy-deep);
-            color: var(--white);
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            background: var(--navy-deep);
-            border-top: 1px solid rgba(var(--white-rgb), 0.08);
-            padding: 36px 0;
-        }
-
-        footer .container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 16px;
-        }
-
-        .copyright {
-            color: var(--muted);
-            font-size: 0.82rem;
-            width: 100%;
-            text-align: center;
-            margin-top: 24px;
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 860px) {
-            .activity-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .featured-image-container {
-                height: 240px;
-            }
-
-            nav {
-                position: fixed;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                width: 78%;
-                max-width: 320px;
-                background: var(--navy-deep);
-                transform: translateX(100%);
-                transition: transform .35s ease;
-                padding: 100px 32px 32px;
-                z-index: 99;
-            }
-
-            nav.open {
-                transform: translateX(0);
-            }
-
-            nav ul {
-                flex-direction: column;
-                gap: 26px;
-            }
-
-            .nav-toggle {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-                background: none;
-                border: none;
-                cursor: pointer;
-                z-index: 101;
-                padding: 6px;
-            }
-
-            .nav-toggle span {
-                width: 24px;
-                height: 2px;
-                background: var(--white);
-                display: block;
-            }
-        }
+  .featured-image-container {
+    height: 240px;
+  }
+}

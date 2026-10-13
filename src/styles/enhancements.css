@@ -982,3 +982,23 @@ html[dir='ltr'] .ann-arrow {
     justify-content: center;
   }
 }
+
+
+/* ===== منع تغطية الهيدر الثابت للمحتوى =====
+   - قيمة احتياطية أكبر إن لم يضبط JS المتغير --fixed-stack-height.
+   - scroll-margin-top: عند الضغط على روابط القائمة (#about ...) لا يختفي
+     عنوان القسم خلف الهيدر الثابت. */
+.hero {
+  padding-top: calc(var(--fixed-stack-height, 130px) + 30px);
+}
+
+section[id],
+[id].hero {
+  scroll-margin-top: calc(var(--fixed-stack-height, 130px) + 8px);
+}
+
+@media (max-width: 860px) {
+  .hero {
+    padding-top: calc(var(--fixed-stack-height, 110px) + 20px);
+  }
+}
