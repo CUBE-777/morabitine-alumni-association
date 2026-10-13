@@ -101,7 +101,7 @@
 
 /* ================================================= */
 
-.admin-login-box button[type="submit"] {
+.admin-login-box > button[type="submit"] {
   width: 100%;
   padding: 12px;
   background: var(--gold);
@@ -115,11 +115,11 @@
   font-family: inherit;
 }
 
-.admin-login-box button[type="submit"]:hover {
+.admin-login-box > button[type="submit"]:hover {
   background: var(--gold-light);
 }
 
-.admin-login-box button[type="submit"]:disabled {
+.admin-login-box > button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -140,4 +140,69 @@
   font-size: 0.82rem;
   color: var(--muted);
   text-decoration: none;
+}
+
+/* ===== تثبيت شكل زر إظهار/إخفاء كلمة المرور =====
+   خصوصية عالية حتى لا تغلبه أي قاعدة button عامة أو قاعدة زر الدخول. */
+.admin-login-box .admin-login-password .admin-login-toggle {
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--navy-deep);
+  opacity: 0.75;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.admin-login-box .admin-login-password .admin-login-toggle:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.admin-login-box .admin-login-password input {
+  width: 100%;
+  padding-inline-end: 48px;
+}
+
+
+/* ===== تحصين ضد قواعد الموقع العام العامة (form / form input / form label) =====
+   قواعد public-home.css تستهدف أي <form> و<input> (نص أبيض وخلفية شفافة)، وصندوق
+   الدخول هو <form>، فنثبّت ألوانه صراحةً. */
+.admin-login-box {
+  border: 0;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.admin-login-box .admin-login-group input {
+  background: var(--white);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 14px;
+}
+
+.admin-login-box .admin-login-group input::placeholder {
+  color: var(--muted-light);
+}
+
+.admin-login-box .admin-login-group label {
+  color: var(--navy-deep);
+  margin-bottom: 6px;
+}
+
+.admin-login-box .admin-login-password input {
+  padding-inline-end: 48px;
 }
