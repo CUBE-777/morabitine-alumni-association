@@ -25,10 +25,26 @@ export async function updateAdminProfile(existing, payload) {
 }
 
 /** ينشئ المسؤول بالكامل على الخادم عبر Edge Function (تستخدم service_role هناك فقط، وليس في المتصفح). */
-export async function createAdminProfile({ email, full_name, role }) {
-  const { data, error } = await supabase.functions.invoke('admin-create-user', { body: { email, full_name, role } });
-  if (error) throw error;
-  if (data?.error) throw new Error(data.error);
+export async function createAdminProfile({ email, full_name, role, password }) {
+  const { data, error } = await supabase.functions.invoke('admin-create-user', { body: { email, full_name, role, password } });
+  if (error) {
+    // الاستجابة غير الناجحة تحمل سبب الرفض بالعربية في جسمها؛ نعرضه بدل الرسالة العامة
+    let userMessage = '';
+    try {
+      const body = await error.context?.json?.();
+      userMessage = body?.error || '';
+    } catch {
+      /* لا شيء */
+    }
+    const e = new Error(userMessage || error.message);
+    e.userMessage = userMessage;
+    throw e;
+  }
+  if (data?.error) {
+    const e = new Error(data.error);
+    e.userMessage = data.error;
+    throw e;
+  }
   await logAction('ADMIN_CREATED_ADMIN', 'profiles', data?.id || null, `إنشاء مسؤول جديد: ${full_name} (${email}) — الدور: ${ROLE_LABELS[role] || role}`);
   return data;
 }
