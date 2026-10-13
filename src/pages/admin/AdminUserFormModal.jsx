@@ -8,9 +8,19 @@ export default function AdminUserFormModal({ profile, onClose, onSaved }) {
     full_name: profile?.full_name || '',
     email: profile?.email || '',
     role: profile?.role || 'editor',
+    password: '',
     is_active: profile?.is_active !== false,
   });
   const [saving, setSaving] = useState(false);
+
+  // كلمة مرور عشوائية بلا أحرف ملتبسة (0/O و1/l/I) ليسهل نقلها للمسؤول الجديد
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    const bytes = new Uint32Array(12);
+    crypto.getRandomValues(bytes);
+    const pwd = Array.from(bytes, (b) => chars[b % chars.length]).join('');
+    setValues((v) => ({ ...v, password: pwd }));
+  };
 
   const handleChange = (e) => {
     const { name, type, checked, value } = e.target;
@@ -25,6 +35,10 @@ export default function AdminUserFormModal({ profile, onClose, onSaved }) {
       window.notify?.error('الاسم والبريد مطلوبان');
       return;
     }
+    if (!isEdit && values.password.length < 8) {
+      window.notify?.error('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+      return;
+    }
     setSaving(true);
     const t = window.notify?.loading('جاري الحفظ...');
     try {
@@ -34,14 +48,15 @@ export default function AdminUserFormModal({ profile, onClose, onSaved }) {
         t?.remove();
         window.notify?.success('تم الحفظ بنجاح');
       } else {
-        await createAdminProfile({ email, full_name, role: values.role });
+        await createAdminProfile({ email, full_name, role: values.role, password: values.password });
         t?.remove();
-        window.notify?.success('تم إنشاء المسؤول بنجاح، وأُرسل له رابط لضبط كلمة المرور.');
+        window.notify?.success('تم إنشاء المسؤول. سلّمه البريد وكلمة المرور ليدخل من صفحة تسجيل الدخول.');
       }
       onSaved();
     } catch (err) {
       t?.remove();
-      window.notify?.fromError(err, isEdit ? 'تعذر الحفظ' : 'تعذر إنشاء المسؤول');
+      if (err.userMessage) window.notify?.error(err.userMessage);
+      else window.notify?.fromError(err, isEdit ? 'تعذر الحفظ' : 'تعذر إنشاء المسؤول');
       setSaving(false);
     }
   };
@@ -76,6 +91,29 @@ export default function AdminUserFormModal({ profile, onClose, onSaved }) {
             </p>
           )}
         </div>
+        {!isEdit && (
+          <div className="admin-form-group">
+            <label htmlFor="f_password">كلمة المرور *</label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <input
+                id="f_password"
+                name="password"
+                type="text"
+                className="admin-input"
+                dir="ltr"
+                autoComplete="off"
+                minLength={8}
+                required
+                value={values.password}
+                onChange={handleChange}
+              />
+              <button type="button" className="admin-btn admin-btn-ghost admin-btn-sm" onClick={generatePassword}>
+                توليد
+              </button>
+            </div>
+            <p className="admin-hint">8 أحرف على الأقل. انسخها وسلّمها للمسؤول الجديد، ويمكنه تغييرها لاحقًا.</p>
+          </div>
+        )}
         <div className="admin-form-group">
           <label htmlFor="f_role">الدور</label>
           <select id="f_role" name="role" className="admin-select" value={values.role} onChange={handleChange}>
