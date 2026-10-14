@@ -230,6 +230,10 @@
   html[dir='ltr'] .admin-sidebar {
     transform: translateX(-105%);
   }
+  /* مهم: يجب أن تكون خصوصية هذا المحدد أعلى من html[dir='rtl'|'ltr'] .admin-sidebar
+     أعلاه، وإلا يبقى الدرج خارج الشاشة حتى بعد الضغط على زر القائمة. */
+  html[dir='rtl'] .admin-sidebar.mobile-open,
+  html[dir='ltr'] .admin-sidebar.mobile-open,
   .admin-sidebar.mobile-open {
     transform: translateX(0);
   }
