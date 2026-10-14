@@ -296,7 +296,13 @@
     "university": "University / institution",
     "bio": "About",
     "boardPosition": "Position",
-    "fullUniversity": "University: {{name}}"
+    "fullUniversity": "University: {{name}}",
+    "viewProfile": "View profile",
+    "close": "Close",
+    "about": "About",
+    "studyPath": "Academic path",
+    "additionalInfo": "More info",
+    "links": "Social links"
   },
   "board": {
     "featured": "Leading the board",

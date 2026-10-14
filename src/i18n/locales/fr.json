@@ -296,7 +296,13 @@
     "university": "Université / établissement",
     "bio": "À propos",
     "boardPosition": "Poste",
-    "fullUniversity": "Université : {{name}}"
+    "fullUniversity": "Université : {{name}}",
+    "viewProfile": "Voir le profil",
+    "close": "Fermer",
+    "about": "À propos",
+    "studyPath": "Parcours académique",
+    "additionalInfo": "Informations complémentaires",
+    "links": "Réseaux sociaux"
   },
   "board": {
     "featured": "À la tête du bureau",

@@ -10,7 +10,7 @@ import {
 } from '../../services/supabase/adminMembers.service';
 
 const FIELD = (v) => (v == null || v === '' ? '—' : v);
-const CSV_HEADERS = ['full_name', 'promotion', 'track', 'profession', 'city', 'email', 'phone', 'status'];
+const CSV_HEADERS = ['full_name', 'university', 'promotion', 'track', 'profession', 'city', 'email', 'phone', 'status'];
 
 export default function Members() {
   const [page, setPage] = useState(1);
@@ -101,7 +101,7 @@ export default function Members() {
             type="text"
             className="admin-input"
             style={{ minWidth: 220, flex: 1 }}
-            placeholder="ابحث بالاسم، المهنة، المدينة، الدفعة..."
+            placeholder="ابحث بالاسم، الجامعة، المهنة، المدينة، الدفعة..."
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -119,12 +119,13 @@ export default function Members() {
           <div className="admin-table-wrap">
             <table className="admin-data-table admin-table-cards">
               <thead>
-                <tr><th>الاسم</th><th>الدفعة</th><th>المهنة</th><th>المدينة</th><th>الحالة</th><th>إجراءات</th></tr>
+                <tr><th>الاسم</th><th>الجامعة</th><th>الدفعة</th><th>المهنة</th><th>المدينة</th><th>الحالة</th><th>إجراءات</th></tr>
               </thead>
               <tbody>
                 {rows.map((m) => (
                   <tr key={m.id}>
                     <td data-label="الاسم">{m.full_name}</td>
+                    <td data-label="الجامعة">{FIELD(m.university)}</td>
                     <td data-label="الدفعة">{FIELD(m.promotion)}</td>
                     <td data-label="المهنة">{FIELD(m.profession)}</td>
                     <td data-label="المدينة">{FIELD(m.city)}</td>

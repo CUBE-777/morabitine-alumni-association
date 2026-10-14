@@ -12,6 +12,11 @@ function memberRowToPerson(row) {
     track: row.track,
     profession: row.profession,
     image: row.photo_url,
+    // الملف العام (migration 0010) — قد تكون غير موجودة إن لم تُشغَّل بعد
+    publicBio: row.public_bio,
+    studyPath: row.study_path,
+    socials: row.socials,
+    extra: row.extra,
   };
 }
 
@@ -40,12 +45,17 @@ export async function fetchPeopleDirectory(listKey) {
     return (data || []).map(boardRowToPerson);
   }
   // نطلب فقط الأعمدة العامة غير الحساسة (RLS يرفض الباقي أصلاً لدور anon).
-  const { data, error } = await supabase
+  // نحاول أولًا مع أعمدة الملف العام الجديدة، وإن لم تكن موجودة بعد (migration 0010
+  // لم تُشغَّل) نرجع تلقائيًا للأعمدة الأساسية حتى لا تتعطل الصفحة.
+  const BASE_COLS = 'id, full_name, photo_url, promotion, track, university, profession, status, created_at, deleted_at';
+  const queryMembers = (cols) => supabase
     .from('members')
-    .select('id, full_name, photo_url, promotion, track, university, profession, status, created_at, deleted_at')
+    .select(cols)
     .eq('status', 'active')
     .is('deleted_at', null)
     .order('created_at', { ascending: false });
-  if (error) throw error;
-  return (data || []).map(memberRowToPerson);
+  let res = await queryMembers(`${BASE_COLS}, public_bio, study_path, socials, extra`);
+  if (res.error) res = await queryMembers(BASE_COLS);
+  if (res.error) throw res.error;
+  return (res.data || []).map(memberRowToPerson);
 }

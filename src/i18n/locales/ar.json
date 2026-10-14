@@ -296,7 +296,13 @@
     "university": "الجامعة / المؤسسة",
     "bio": "نبذة",
     "boardPosition": "المنصب",
-    "fullUniversity": "الجامعة: {{name}}"
+    "fullUniversity": "الجامعة: {{name}}",
+    "viewProfile": "عرض الملف الشخصي",
+    "close": "إغلاق",
+    "about": "نبذة",
+    "studyPath": "المسار الدراسي",
+    "additionalInfo": "معلومات إضافية",
+    "links": "حسابات التواصل"
   },
   "board": {
     "featured": "على رأس المكتب",

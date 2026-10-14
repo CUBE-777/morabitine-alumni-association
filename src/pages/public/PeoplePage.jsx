@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import InteriorLayout from '../../layouts/InteriorLayout';
 import PageHero from '../../components/layout/PageHero';
 import PersonCard from '../../components/common/PersonCard';
+import PersonModal from '../../components/common/PersonModal';
 import { fetchPeopleDirectory } from '../../services/supabase/peopleDirectory.service';
 import { normalizeSearchValue, matchesMemberSearch } from '../../utils/arabicSearch';
 
@@ -28,6 +29,7 @@ export default function PeoplePage({
   const [people, setPeople] = useState(null); // null = يحمَّل
   const [query, setQuery] = useState('');
   const [error, setError] = useState(false);
+  const [selected, setSelected] = useState(null); // العضو المعروض ملفه في النافذة
 
   const load = useCallback(() => {
     let alive = true;
@@ -103,6 +105,7 @@ export default function PeoplePage({
                 fallbackBadge={fallbackBadge}
                 variant={isBoard ? 'board' : 'member'}
                 featured={isBoard && i === 0 && !query}
+                onOpen={isBoard ? undefined : setSelected}
               />
             ))}
           </div>
@@ -114,6 +117,7 @@ export default function PeoplePage({
           </div>
         </div>
       </section>
+      {selected && <PersonModal person={selected} fallbackBadge={fallbackBadge} onClose={() => setSelected(null)} />}
     </InteriorLayout>
   );
 }

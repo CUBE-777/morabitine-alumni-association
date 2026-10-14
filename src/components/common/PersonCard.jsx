@@ -1,12 +1,14 @@
 import { useTranslation } from 'react-i18next';
+import { GraduationCap } from 'lucide-react';
+import { getPersonDetails } from '../../utils/personDetails';
 
 /**
  * بطاقة شخص — variant="member" (دليل الأعضاء) أو "board" (المكتب المسير).
- * الأعضاء: الصورة ← الاسم ← الشارة ← الجامعة ← المعلومات الثانوية (أخف وزنًا).
+ * الأعضاء: الصورة ← الجامعة (كبسولة بنفسجية تحتها) | الاسم ← الشارة ← المعلومات الثانوية.
  * المكتب: المنصب (هو العنوان البصري) ← الصورة ← الاسم ← الجامعة ← نبذة مختصرة.
  * النصوص الثابتة (labels) مترجمة؛ بيانات الأشخاص تُعرض كما هي من قاعدة البيانات.
  */
-export default function PersonCard({ person, fallbackBadge, variant = 'member', featured = false }) {
+export default function PersonCard({ person, fallbackBadge, variant = 'member', featured = false, onOpen }) {
   const { t } = useTranslation();
   const name = person.name || t('person.defaultName');
   const university = (person.university || '').trim();
@@ -43,6 +45,7 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
   }
 
   const badge = person.role || fallbackBadge;
+  const hasDetails = !!onOpen && getPersonDetails(person).hasAny;
   const facts = [
     [t('person.age'), person.age],
     [t('person.promo'), person.promo],
@@ -55,17 +58,19 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
       <div className="member-card-main">
         <div className="member-photo-column">
           <img className="member-photo" {...photoProps} />
+          {university && (
+            <span className="member-university member-university-under" title={t('person.fullUniversity', { name: university })}>
+              <GraduationCap size={12} aria-hidden="true" />
+              <span className="sr-only">{t('person.university')}: </span>
+              {university}
+            </span>
+          )}
         </div>
         <div className="member-body">
           <div className="member-name-row">
             <h3>{name}</h3>
             <span className="member-badge">{badge}</span>
           </div>
-          {university && (
-            <p className="member-university-line" title={t('person.fullUniversity', { name: university })}>
-              <span className="member-university">{university}</span>
-            </p>
-          )}
           {facts.length > 0 && (
             <ul className="member-facts">
               {facts.map(([label, value]) => (
@@ -75,6 +80,11 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
                 </li>
               ))}
             </ul>
+          )}
+          {hasDetails && (
+            <button type="button" className="member-more-btn" onClick={() => onOpen(person)}>
+              {t('person.viewProfile')}
+            </button>
           )}
         </div>
       </div>
