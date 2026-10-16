@@ -2,6 +2,12 @@ import { useState } from 'react';
 import Modal from '../../components/admin/Modal';
 import { uploadImage } from '../../services/supabase/storage.service';
 import { saveBoardMember } from '../../services/supabase/adminBoard.service';
+import PublicProfileFields, {
+  BOARD_TR_FIELDS,
+  initProfileState,
+  buildProfile,
+  applyProfileToPayload,
+} from '../../components/admin/PublicProfileFields';
 
 export default function BoardFormModal({ member, onClose, onSaved }) {
   const isEdit = !!member;
@@ -12,6 +18,7 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
     bio: member?.bio || '',
     is_active: member?.is_active !== false,
   });
+  const [profile, setProfile] = useState(() => initProfileState(member, BOARD_TR_FIELDS));
   const [photoFile, setPhotoFile] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -28,6 +35,12 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
       window.notify?.error('الاسم والصفة مطلوبان');
       return;
     }
+    // الملف العام + الترجمات: التحقق من الروابط وبناء الحمولة (نفس منطق نموذج الأعضاء)
+    const built = buildProfile(profile, member, BOARD_TR_FIELDS);
+    if (built.error) {
+      window.notify?.error(built.error);
+      return;
+    }
     setSaving(true);
     const t = window.notify?.loading('جاري الحفظ...');
     try {
@@ -38,10 +51,15 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
         bio: values.bio.trim() || null,
         is_active: values.is_active,
       };
+      // أعمدة الملف العام والترجمات (0011): تُرسل فقط إن كانت موجودة أصلًا أو كُتب فيها شيء
+      applyProfileToPayload(payload, built, member, isEdit);
       if (photoFile) payload.photo_url = await uploadImage(photoFile, 'board');
-      await saveBoardMember(member, payload);
+      const result = await saveBoardMember(member, payload);
       t?.remove();
       window.notify?.success('تم الحفظ بنجاح');
+      if (result?.degraded) {
+        window.notify?.info('حُفظت البيانات الأساسية، أما الملف العام والترجمات فيحتاجان تشغيل ملف SQL رقم 0011 في Supabase أولًا.');
+      }
       onSaved();
     } catch (err) {
       t?.remove();
@@ -76,9 +94,16 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
           <input id="f_uni" name="university" className="admin-input" value={values.university} onChange={handleChange} />
         </div>
         <div className="admin-form-group">
-          <label htmlFor="f_bio">نبذة</label>
+          <label htmlFor="f_bio">نبذة مختصرة (تظهر على بطاقة المكتب)</label>
           <textarea id="f_bio" name="bio" className="admin-textarea" rows={3} value={values.bio} onChange={handleChange} />
         </div>
+        <PublicProfileFields
+          profile={profile}
+          setProfile={setProfile}
+          trFields={BOARD_TR_FIELDS}
+          source={{ position: values.position, bio: values.bio }}
+          bioLabel="النبذة العامة (تظهر في نافذة الملف الشخصي)"
+        />
         <div className="admin-form-group">
           <label>
             <input type="checkbox" name="is_active" checked={values.is_active} onChange={handleChange} /> نشط ويظهر في الموقع

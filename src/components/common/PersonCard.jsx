@@ -6,7 +6,8 @@ import { getPersonDetails } from '../../utils/personDetails';
  * بطاقة شخص — variant="member" (دليل الأعضاء) أو "board" (المكتب المسير).
  * الأعضاء: الصورة ← الجامعة (كبسولة بنفسجية تحتها) | الاسم ← الشارة ← المعلومات الثانوية.
  * المكتب: المنصب (هو العنوان البصري) ← الصورة ← الاسم ← الجامعة ← نبذة مختصرة.
- * النصوص الثابتة (labels) مترجمة؛ بيانات الأشخاص تُعرض كما هي من قاعدة البيانات.
+ * النصوص الثابتة (labels) مترجمة؛ بيانات الأشخاص تصل مترجمة من الصفحة (localizePerson) مع رجوع للعربية.
+ * عضو المكتب داخل صفحة الأعضاء (person.isBoard): نفس بطاقة العضو وشارته تعرض صفته بلون مميّز.
  */
 export default function PersonCard({ person, fallbackBadge, variant = 'member', featured = false, onOpen }) {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
 
   if (variant === 'board') {
     const position = person.role || fallbackBadge;
+    const boardHasDetails = !!onOpen && getPersonDetails(person).hasAny;
     return (
       <article className={`board-card${featured ? ' board-card-featured' : ''}`}>
         <div className="board-card-position">
@@ -39,6 +41,11 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
             </span>
           )}
           {person.bio && <p className="board-card-bio">{person.bio}</p>}
+          {boardHasDetails && (
+            <button type="button" className="member-more-btn board-card-more-btn" onClick={() => onOpen(person)}>
+              {t('person.viewProfile')}
+            </button>
+          )}
         </div>
       </article>
     );
@@ -69,7 +76,7 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
         <div className="member-body">
           <div className="member-name-row">
             <h3>{name}</h3>
-            <span className="member-badge">{badge}</span>
+            <span className={`member-badge${person.isBoard ? ' member-badge-board' : ''}`}>{badge}</span>
           </div>
           {facts.length > 0 && (
             <ul className="member-facts">

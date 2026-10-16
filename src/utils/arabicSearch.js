@@ -11,7 +11,7 @@ export function normalizeSearchValue(value) {
 
 export function matchesMemberSearch(person, query) {
   if (!query) return true;
-  const searchableText = [person.name, person.university, person.promo]
+  const searchableText = [person.name, person.altName, person.university, person.promo]
     .map(normalizeSearchValue)
     .join(' ');
   return searchableText.includes(query);

@@ -1199,3 +1199,19 @@ section[id],
     grid-template-columns: 1fr;
   }
 }
+
+
+/* ===== أعضاء المكتب داخل صفحة الأعضاء: شارة الصفة بلون مميّز (إضافة فقط) ===== */
+.member-card .member-badge.member-badge-board {
+  background: linear-gradient(135deg, var(--navy-mid), var(--navy-deep));
+  border-color: var(--gold);
+  color: var(--gold-light);
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
+}
+/* زر عرض الملف داخل بطاقة المكتب: في منتصف البطاقة */
+.board-card-more-btn {
+  align-self: center;
+  margin-top: var(--space-1);
+}

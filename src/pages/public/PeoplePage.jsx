@@ -6,6 +6,7 @@ import PersonCard from '../../components/common/PersonCard';
 import PersonModal from '../../components/common/PersonModal';
 import { fetchPeopleDirectory } from '../../services/supabase/peopleDirectory.service';
 import { normalizeSearchValue, matchesMemberSearch } from '../../utils/arabicSearch';
+import { localizePerson } from '../../utils/personTranslations';
 
 /**
  * صفحة موحّدة تُستخدم لكل من /members و/board — تطابق تمامًا العلاقة بين
@@ -25,7 +26,8 @@ export default function PeoplePage({
   searchPlaceholder,
 }) {
   const isBoard = listKey === 'board';
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = String(i18n.resolvedLanguage || i18n.language || 'ar').slice(0, 2);
   const [people, setPeople] = useState(null); // null = يحمَّل
   const [query, setQuery] = useState('');
   const [error, setError] = useState(false);
@@ -48,11 +50,14 @@ export default function PeoplePage({
 
   useEffect(() => load(), [load]);
 
+  // عرض بيانات الأشخاص بلغة الزائر (مع الرجوع للعربية عند غياب الترجمة)
+  const localized = useMemo(() => (people ? people.map((p) => localizePerson(p, lang)) : null), [people, lang]);
+
   const filtered = useMemo(() => {
-    if (!people) return [];
+    if (!localized) return [];
     const normalizedQuery = normalizeSearchValue(query);
-    return people.filter((p) => matchesMemberSearch(p, normalizedQuery));
-  }, [people, query]);
+    return localized.filter((p) => matchesMemberSearch(p, normalizedQuery));
+  }, [localized, query]);
 
   useEffect(() => {
     document.title = `${title} — ${t('brand.name')}`;
@@ -100,12 +105,12 @@ export default function PeoplePage({
             )}
             {filtered.map((person, i) => (
               <PersonCard
-                key={`${person.name}-${i}`}
+                key={`${person.id || person.name}-${i}`}
                 person={person}
                 fallbackBadge={fallbackBadge}
                 variant={isBoard ? 'board' : 'member'}
                 featured={isBoard && i === 0 && !query}
-                onOpen={isBoard ? undefined : setSelected}
+                onOpen={setSelected}
               />
             ))}
           </div>
@@ -117,7 +122,7 @@ export default function PeoplePage({
           </div>
         </div>
       </section>
-      {selected && <PersonModal person={selected} fallbackBadge={fallbackBadge} onClose={() => setSelected(null)} />}
+      {selected && <PersonModal person={localizePerson(selected, lang)} fallbackBadge={fallbackBadge} onClose={() => setSelected(null)} />}
     </InteriorLayout>
   );
 }
