@@ -27,6 +27,7 @@ export const MEMBER_TR_FIELDS = [
 ];
 export const BOARD_TR_FIELDS = [
   { key: 'position', label: 'الصفة', max: 100 },
+  { key: 'track', label: 'التخصص (الشعبة)', max: 200 },
   { key: 'bio', label: 'النبذة المختصرة (بطاقة المكتب)', rows: 2, max: 400 },
   { key: 'public_bio', label: 'النبذة العامة', rows: 3, max: 600 },
   { key: 'study_path', label: 'المسار الدراسي', rows: 3, max: 800 },

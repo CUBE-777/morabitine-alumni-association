@@ -18,14 +18,19 @@ const strip = (payload, keys) => {
 
 /**
  * run(payload) => Promise<{data, error}>
+ * optionalCols: أعمدة اختيارية إضافية خاصة بالجدول (مثل promotion/track في board_members بعد 0012).
+ * الترتيب: كاملة ← بدون الاختيارية ← بدون الترجمات ← بدون الملف العام. نتجاوز المحاولات المكرّرة.
  * يُرجع { res, degraded } حيث degraded=true إن حُفظت بيانات ناقصة بسبب غياب أعمدة.
  */
-export async function runWithColumnFallback(run, payload) {
-  const hasTr = TRANSLATION_COL in payload;
-  const hasProfile = PROFILE_COLS.some((k) => k in payload);
-  const attempts = [payload];
-  if (hasTr) attempts.push(strip(payload, [TRANSLATION_COL]));
-  if (hasProfile || hasTr) attempts.push(strip(payload, [...PROFILE_COLS, TRANSLATION_COL]));
+export async function runWithColumnFallback(run, payload, optionalCols = []) {
+  const steps = [[], optionalCols, [...optionalCols, TRANSLATION_COL], [...optionalCols, TRANSLATION_COL, ...PROFILE_COLS]];
+  const attempts = [];
+  steps.forEach((keys) => {
+    const candidate = strip(payload, keys);
+    if (!attempts.length || Object.keys(candidate).length < Object.keys(attempts[attempts.length - 1]).length) {
+      attempts.push(candidate);
+    }
+  });
 
   let res;
   let degraded = false;

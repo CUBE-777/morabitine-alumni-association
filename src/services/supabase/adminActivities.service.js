@@ -1,5 +1,6 @@
 import { supabase } from './client';
 import { logAction } from './auth.service';
+import { runWithColumnFallback } from './profileColumns';
 
 export const STATUS_LABEL = { draft: 'مسودة', published: 'منشور', archived: 'مؤرشف' };
 
@@ -21,20 +22,28 @@ function slugify(title) {
   );
 }
 
+// يُرجع { degraded } = true إن حُفظ النص العربي فقط لأن عمود translations (0013) غير موجود بعد.
 export async function saveActivity(existing, payload) {
   if (!existing) {
     payload.slug = slugify(payload.title);
     payload.status = 'draft';
   }
   if (existing) {
-    const { error } = await supabase.from('activities').update(payload).eq('id', existing.id);
-    if (error) throw error;
+    const { res, degraded } = await runWithColumnFallback(
+      (p) => supabase.from('activities').update(p).eq('id', existing.id),
+      payload
+    );
+    if (res.error) throw res.error;
     await logAction('ADMIN_UPDATED_ACTIVITY', 'activities', existing.id, `تعديل النشاط ${payload.title}`);
-  } else {
-    const { data, error } = await supabase.from('activities').insert(payload).select().single();
-    if (error) throw error;
-    await logAction('ADMIN_CREATED_ACTIVITY', 'activities', data.id, `إضافة نشاط جديد: ${payload.title}`);
+    return { degraded };
   }
+  const { res, degraded } = await runWithColumnFallback(
+    (p) => supabase.from('activities').insert(p).select().single(),
+    payload
+  );
+  if (res.error) throw res.error;
+  await logAction('ADMIN_CREATED_ACTIVITY', 'activities', res.data.id, `إضافة نشاط جديد: ${payload.title}`);
+  return { degraded };
 }
 
 export async function setActivityStatus(activity, status) {

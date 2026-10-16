@@ -1,5 +1,6 @@
 import { supabase } from './client';
 import { logAction } from './auth.service';
+import { isMissingColumn } from './profileColumns';
 
 export const SETTINGS_GROUPS = [
   {
@@ -23,14 +24,26 @@ export const SETTINGS_GROUPS = [
   { title: 'الخريطة', keys: [['google_maps_url', 'رابط خرائط Google']] },
 ];
 
+// مفاتيح الإعدادات النصية القابلة للترجمة (البريد والهاتف والروابط لا تُترجم)
+export const TRANSLATABLE_SETTINGS = ['association_name', 'address'];
+
 export async function fetchSiteSettingsAdmin() {
   const { data, error } = await supabase.from('site_settings').select('*');
   if (error) throw error;
   return data || [];
 }
 
+// يُرجع { degraded } = true إن حُفظت النصوص العربية فقط لأن عمود translations (0013) غير موجود بعد.
 export async function saveSiteSettings(rows) {
-  const { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'key' });
+  let degraded = false;
+  let { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'key' });
+  if (error && isMissingColumn(error) && rows.some((r) => 'translations' in r)) {
+    degraded = true;
+    ({ error } = await supabase
+      .from('site_settings')
+      .upsert(rows.map(({ translations, ...rest }) => rest), { onConflict: 'key' }));
+  }
   if (error) throw error;
   await logAction('ADMIN_UPDATED_SETTINGS', 'site_settings', null, 'تحديث الإعدادات العامة');
+  return { degraded };
 }

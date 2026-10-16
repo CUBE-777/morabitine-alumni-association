@@ -15,6 +15,8 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
     full_name: member?.full_name || '',
     position: member?.position || '',
     university: member?.university || '',
+    promotion: member?.promotion || '',
+    track: member?.track || '',
     bio: member?.bio || '',
     is_active: member?.is_active !== false,
   });
@@ -51,6 +53,11 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
         bio: values.bio.trim() || null,
         is_active: values.is_active,
       };
+      // سنة التخرج والتخصص (migration 0012): تُرسل فقط إن كان العمودان موجودين أصلًا أو كُتب فيهما شيء
+      const promotion = values.promotion.trim();
+      const track = values.track.trim();
+      if ((isEdit && 'promotion' in member) || promotion) payload.promotion = promotion || null;
+      if ((isEdit && 'track' in member) || track) payload.track = track || null;
       // أعمدة الملف العام والترجمات (0011): تُرسل فقط إن كانت موجودة أصلًا أو كُتب فيها شيء
       applyProfileToPayload(payload, built, member, isEdit);
       if (photoFile) payload.photo_url = await uploadImage(photoFile, 'board');
@@ -58,7 +65,7 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
       t?.remove();
       window.notify?.success('تم الحفظ بنجاح');
       if (result?.degraded) {
-        window.notify?.info('حُفظت البيانات الأساسية، أما الملف العام والترجمات فيحتاجان تشغيل ملف SQL رقم 0011 في Supabase أولًا.');
+        window.notify?.info('حُفظت البيانات الأساسية، أما الملف العام والترجمات فيحتاجان تشغيل ملفي SQL رقم 0011 و0012 في Supabase أولًا.');
       }
       onSaved();
     } catch (err) {
@@ -93,6 +100,16 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
           <label htmlFor="f_uni">الجامعة/الإطار</label>
           <input id="f_uni" name="university" className="admin-input" value={values.university} onChange={handleChange} />
         </div>
+        <div className="admin-form-grid-2">
+          <div className="admin-form-group">
+            <label htmlFor="f_promotion">سنة التخرج (الدفعة)</label>
+            <input id="f_promotion" name="promotion" className="admin-input" maxLength={60} value={values.promotion} onChange={handleChange} />
+          </div>
+          <div className="admin-form-group">
+            <label htmlFor="f_track">التخصص (الشعبة)</label>
+            <input id="f_track" name="track" className="admin-input" maxLength={200} value={values.track} onChange={handleChange} />
+          </div>
+        </div>
         <div className="admin-form-group">
           <label htmlFor="f_bio">نبذة مختصرة (تظهر على بطاقة المكتب)</label>
           <textarea id="f_bio" name="bio" className="admin-textarea" rows={3} value={values.bio} onChange={handleChange} />
@@ -101,7 +118,7 @@ export default function BoardFormModal({ member, onClose, onSaved }) {
           profile={profile}
           setProfile={setProfile}
           trFields={BOARD_TR_FIELDS}
-          source={{ position: values.position, bio: values.bio }}
+          source={{ position: values.position, bio: values.bio, track: values.track }}
           bioLabel="النبذة العامة (تظهر في نافذة الملف الشخصي)"
         />
         <div className="admin-form-group">

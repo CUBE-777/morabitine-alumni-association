@@ -6,47 +6,67 @@
  */
 import { supabase } from './client';
 
+// يحاول جلب عمود translations (migration 0013) وإن لم يوجد بعد يرجع للأعمدة الأساسية.
+async function selectWithTranslations(table, cols) {
+  let res = await supabase.from(table).select(`${cols}, translations`);
+  if (res.error) res = await supabase.from(table).select(cols);
+  if (res.error) throw res.error;
+  return res.data || [];
+}
+
 export async function fetchPublishedActivities(limit = 8) {
-  const { data, error } = await supabase
+  const query = (cols) => supabase
     .from('activities')
-    .select('slug, title, description, category, cover_image_url')
+    .select(cols)
     .eq('status', 'published')
     .is('deleted_at', null)
     .order('date', { ascending: false })
     .limit(limit);
-  if (error) throw error;
-  return data || [];
+  const BASE = 'slug, title, description, category, cover_image_url';
+  // sub_activities غير مطلوبة للبطاقات؛ الترجمة تُجلب مع تراجع تلقائي إن لم تُشغَّل 0013
+  let res = await query(`${BASE}, translations`);
+  if (res.error) res = await query(BASE);
+  if (res.error) throw res.error;
+  return res.data || [];
 }
 
 export async function fetchGalleryItems(limit = 12) {
-  const { data, error } = await supabase
+  const query = (cols) => supabase
     .from('gallery')
-    .select('image_url, title, description')
+    .select(cols)
     .is('deleted_at', null)
     .order('sort_order', { ascending: true })
     .limit(limit);
-  if (error) throw error;
-  return data || [];
+  const BASE = 'image_url, title, description';
+  let res = await query(`${BASE}, translations`);
+  if (res.error) res = await query(BASE);
+  if (res.error) throw res.error;
+  return res.data || [];
 }
 
+/** يُرجع { values: {key: نص عربي}, translations: {key: {fr:{value}, en:{value}}} } */
 export async function fetchSiteSettings() {
-  const { data, error } = await supabase.from('site_settings').select('key, value');
-  if (error) throw error;
-  const settings = {};
-  (data || []).forEach((row) => {
-    if (row.value) settings[row.key] = row.value;
+  const data = await selectWithTranslations('site_settings', 'key, value');
+  const values = {};
+  const translations = {};
+  data.forEach((row) => {
+    if (row.value) values[row.key] = row.value;
+    if (row.translations && typeof row.translations === 'object') translations[row.key] = row.translations;
   });
-  return settings;
+  return { values, translations };
 }
 
+/** يُرجع { values: {"section.key": نص عربي}, translations: {"section.key": {fr:{value}, en:{value}}} } */
 export async function fetchSiteContent() {
-  const { data, error } = await supabase.from('site_content').select('section, key, value');
-  if (error) throw error;
-  const content = {};
-  (data || []).forEach((row) => {
-    if (row.value != null && row.value !== '') content[`${row.section}.${row.key}`] = row.value;
+  const data = await selectWithTranslations('site_content', 'section, key, value');
+  const values = {};
+  const translations = {};
+  data.forEach((row) => {
+    const k = `${row.section}.${row.key}`;
+    if (row.value != null && row.value !== '') values[k] = row.value;
+    if (row.translations && typeof row.translations === 'object') translations[k] = row.translations;
   });
-  return content;
+  return { values, translations };
 }
 
 /** يُرجع الإعلان النشط الوحيد ضمن الفترة الزمنية الحالية، أو null. */

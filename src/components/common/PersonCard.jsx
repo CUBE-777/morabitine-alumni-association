@@ -26,6 +26,11 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
   if (variant === 'board') {
     const position = person.role || fallbackBadge;
     const boardHasDetails = !!onOpen && getPersonDetails(person).hasAny;
+    // نفس معلومات بطاقة العضو: سنة التخرج (الدفعة) والتخصص (الشعبة)
+    const boardFacts = [
+      [t('person.promo'), person.promo],
+      [t('person.track'), person.track],
+    ].filter(([, value]) => value != null && String(value).trim() !== '');
     return (
       <article className={`board-card${featured ? ' board-card-featured' : ''}`}>
         <div className="board-card-position">
@@ -39,6 +44,16 @@ export default function PersonCard({ person, fallbackBadge, variant = 'member', 
             <span className="member-university board-card-university" title={t('person.fullUniversity', { name: university })}>
               {university}
             </span>
+          )}
+          {boardFacts.length > 0 && (
+            <ul className="member-facts board-card-facts">
+              {boardFacts.map(([label, value]) => (
+                <li key={label}>
+                  <span>{label}</span>
+                  <strong>{value}</strong>
+                </li>
+              ))}
+            </ul>
           )}
           {person.bio && <p className="board-card-bio">{person.bio}</p>}
           {boardHasDetails && (

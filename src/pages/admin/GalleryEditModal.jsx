@@ -1,24 +1,36 @@
 import { useState } from 'react';
 import Modal from '../../components/admin/Modal';
 import { updateGalleryItem } from '../../services/supabase/adminGallery.service';
+import InlineTranslationInputs from '../../components/admin/InlineTranslationInputs';
+import { cleanTr, hasTr } from '../../utils/translationForm';
 
 export default function GalleryEditModal({ item, activities, onClose, onSaved }) {
   const [title, setTitle] = useState(item.title || '');
   const [description, setDescription] = useState(item.description || '');
   const [activityId, setActivityId] = useState(item.activity_id || '');
+  const [translations, setTranslations] = useState(
+    item.translations && typeof item.translations === 'object' && !Array.isArray(item.translations) ? item.translations : {}
+  );
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
     const t = window.notify?.loading('جاري الحفظ...');
     try {
-      await updateGalleryItem(item, {
+      const payload = {
         title: title.trim() || null,
         description: description.trim() || null,
         activity_id: activityId || null,
-      });
+      };
+      // الترجمات (0013): تُرسل فقط إن كان العمود موجودًا أصلًا أو كُتب فيها شيء
+      const cleaned = cleanTr(translations, 600);
+      if ('translations' in item || hasTr(cleaned)) payload.translations = cleaned;
+      const result = await updateGalleryItem(item, payload);
       t?.remove();
       window.notify?.success('تم الحفظ');
+      if (result?.degraded) {
+        window.notify?.info('حُفظ النص العربي فقط، أما الترجمات فتحتاج تشغيل ملف SQL رقم 0013 في Supabase أولًا.');
+      }
       onSaved();
     } catch (err) {
       t?.remove();
@@ -34,10 +46,12 @@ export default function GalleryEditModal({ item, activities, onClose, onSaved })
       <div className="admin-form-group">
         <label htmlFor="f_title">العنوان</label>
         <input id="f_title" className="admin-input" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <InlineTranslationInputs id="f_title" translations={translations} onChange={setTranslations} trKey="title" placeholder={title} maxLength={200} />
       </div>
       <div className="admin-form-group">
         <label htmlFor="f_desc">الوصف</label>
         <textarea id="f_desc" className="admin-textarea" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
+        <InlineTranslationInputs id="f_desc" translations={translations} onChange={setTranslations} trKey="description" placeholder={description} rows={2} maxLength={600} />
       </div>
       <div className="admin-form-group">
         <label htmlFor="f_activity">ربط بنشاط</label>

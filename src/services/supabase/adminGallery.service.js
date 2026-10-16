@@ -1,6 +1,7 @@
 import { supabase } from './client';
 import { logAction } from './auth.service';
 import { uploadImage } from './storage.service';
+import { runWithColumnFallback } from './profileColumns';
 
 export async function fetchActivitiesForLinking() {
   const { data } = await supabase.from('activities').select('id,title').is('deleted_at', null);
@@ -31,10 +32,15 @@ export async function uploadGalleryFiles(files) {
   return { success, failed };
 }
 
+// يُرجع { degraded } = true إن حُفظ النص العربي فقط لأن عمود translations (0013) غير موجود بعد.
 export async function updateGalleryItem(item, payload) {
-  const { error } = await supabase.from('gallery').update(payload).eq('id', item.id);
-  if (error) throw error;
+  const { res, degraded } = await runWithColumnFallback(
+    (p) => supabase.from('gallery').update(p).eq('id', item.id),
+    payload
+  );
+  if (res.error) throw res.error;
   await logAction('ADMIN_UPDATED_IMAGE', 'gallery', item.id, 'تعديل بيانات صورة في المعرض');
+  return { degraded };
 }
 
 export async function softDeleteGalleryItem(item) {

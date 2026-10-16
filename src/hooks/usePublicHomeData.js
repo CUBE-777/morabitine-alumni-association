@@ -17,6 +17,8 @@ export function usePublicHomeData() {
   const [gallery, setGallery] = useState([]);
   const [settings, setSettings] = useState({});
   const [content, setContent] = useState({});
+  const [settingsTr, setSettingsTr] = useState({}); // ترجمات الإعدادات (key → {fr, en})
+  const [contentTr, setContentTr] = useState({}); // ترجمات المحتوى ("section.key" → {fr, en})
   const [announcement, setAnnouncement] = useState(null);
 
   useEffect(() => {
@@ -31,11 +33,19 @@ export function usePublicHomeData() {
       .catch((err) => console.error('تعذر تحميل صور المعرض:', err));
 
     fetchSiteSettings()
-      .then((data) => alive && setSettings(data))
+      .then((data) => {
+        if (!alive) return;
+        setSettings(data.values);
+        setSettingsTr(data.translations);
+      })
       .catch((err) => console.error('تعذر تحميل الإعدادات العامة:', err));
 
     fetchSiteContent()
-      .then((data) => alive && setContent(data))
+      .then((data) => {
+        if (!alive) return;
+        setContent(data.values);
+        setContentTr(data.translations);
+      })
       .catch((err) => console.error('تعذر تحميل محتوى الصفحة:', err));
 
     fetchActiveAnnouncement()
@@ -47,5 +57,5 @@ export function usePublicHomeData() {
     };
   }, []);
 
-  return { activities, gallery, settings, content, announcement };
+  return { activities, gallery, settings, settingsTr, content, contentTr, announcement };
 }

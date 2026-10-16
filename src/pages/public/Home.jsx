@@ -6,6 +6,7 @@ import ContactForm from '../../features/contact/ContactForm';
 import { usePublicHomeData } from '../../hooks/usePublicHomeData';
 import AnnouncementsBoard from '../../components/announcements/AnnouncementsBoard';
 import { safeUrl } from '../../utils/sanitize';
+import { localizeValue, localizeActivity, localizeGalleryItem } from '../../utils/i18nContent';
 
 const FALLBACK_ICONS = ['🤝', '📚', '🎒', '🌱', '🎓', '🌟', '🏆', '🤲'];
 
@@ -28,38 +29,45 @@ function activityIcon(activity, index) {
 }
 
 export default function Home() {
-  const { t } = useTranslation();
-  const { activities, gallery, settings, content, announcement } = usePublicHomeData();
+  const { t, i18n } = useTranslation();
+  const lang = String(i18n.resolvedLanguage || i18n.language || 'ar').slice(0, 2);
+  const { activities, gallery, settings, settingsTr, content, contentTr, announcement } = usePublicHomeData();
 
   // ===== تحديث عنوان التبويب واتجاه التمرير (behavior parity فقط، لا منطق جديد) =====
   useEffect(() => {
     document.title = t('siteTitle');
   }, [t]);
 
-  const heroTitle = content['homepage.hero_title'];
-  const aboutTitle = content['homepage.about_title'];
-  const brandName = settings.association_name;
-  const footerCopyright = content['footer.copyright'];
+  // نصوص قابلة للتحرير من الإدارة: تُعرض بلغة الزائر مع الرجوع للعربية عند غياب الترجمة
+  const lc = (key) => localizeValue(content[key], contentTr[key], lang);
+  const ls = (key) => localizeValue(settings[key], settingsTr[key], lang);
+  const heroTitle = lc('homepage.hero_title');
+  const aboutTitle = lc('homepage.about_title');
+  const brandName = ls('association_name');
+  const footerCopyright = lc('footer.copyright');
 
   const email = settings.email || t('contact.defaultEmail');
   const phoneDigits = settings.phone ? settings.phone.replace(/[^\d+]/g, '') : '+212679672284';
   const phoneDisplay = settings.phone || t('contact.defaultPhone');
-  const address = settings.address || t('contact.defaultAddress');
+  const address = ls('address') || t('contact.defaultAddress');
   const whatsappNum = settings.whatsapp ? settings.whatsapp.replace(/[^\d]/g, '') : '212679672284';
   const facebookUrl = settings.facebook ? safeUrl(settings.facebook) : '#';
   const instagramUrl = settings.instagram ? safeUrl(settings.instagram) : '#';
   const youtubeUrl = settings.youtube ? safeUrl(settings.youtube) : '';
 
   const activityCards = activities
-    ? activities.map((a, i) => ({
-        icon: activityIcon(a, i),
-        image: safeUrl(a.cover_image_url),
-        category: a.category,
-        title: a.title,
-        // نفس المعالجة الأصلية: إزالة وسوم HTML من الوصف قبل الاقتطاع لعرض معاينة نصية آمنة
-        desc: (a.description || '').replace(/<[^>]*>/g, '').slice(0, 140),
-        href: `/activity/${encodeURIComponent(a.slug)}`,
-      }))
+    ? activities.map((raw, i) => {
+        const a = localizeActivity(raw, lang); // نص بلغة الزائر (الأيقونة تُحسب من الأصل العربي)
+        return {
+          icon: activityIcon(raw, i),
+          image: safeUrl(a.cover_image_url),
+          category: a.category,
+          title: a.title,
+          // نفس المعالجة الأصلية: إزالة وسوم HTML من الوصف قبل الاقتطاع لعرض معاينة نصية آمنة
+          desc: (a.description || '').replace(/<[^>]*>/g, '').slice(0, 140),
+          href: `/activity/${encodeURIComponent(a.slug)}`,
+        };
+      })
     : t('activities.fallback', { returnObjects: true }).map((a) => ({ ...a, href: `/activity/${a.slug}` }));
 
   return (
@@ -183,7 +191,9 @@ export default function Home() {
             {gallery.length === 0 ? (
               <div className="gallery-empty">{t('gallery.empty')}</div>
             ) : (
-              gallery.map((item, i) => (
+              gallery.map((raw, i) => {
+                const item = localizeGalleryItem(raw, lang);
+                return (
                 <figure className="gallery-item" key={`${item.image_url}-${i}`}>
                   <img
                     src={safeUrl(item.image_url)}
@@ -192,7 +202,8 @@ export default function Home() {
                   />
                   {item.title && <figcaption>{item.title}</figcaption>}
                 </figure>
-              ))
+                );
+              })
             )}
           </div>
         </div>

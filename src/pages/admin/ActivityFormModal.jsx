@@ -2,6 +2,17 @@ import { useState } from 'react';
 import Modal from '../../components/admin/Modal';
 import { uploadImage } from '../../services/supabase/storage.service';
 import { saveActivity } from '../../services/supabase/adminActivities.service';
+import TranslationTabs from '../../components/admin/TranslationTabs';
+import { cleanTr, hasTr } from '../../utils/translationForm';
+
+const TR_MAX = 20000; // وصف النشاط HTML طويل
+const ACTIVITY_TR_FIELDS = [
+  { key: 'title', label: 'العنوان', max: 300 },
+  { key: 'category', label: 'الفئة', max: 200 },
+  { key: 'target_audience', label: 'الفئة المستهدفة', max: 300 },
+  { key: 'location', label: 'المكان', max: 300 },
+  { key: 'description', label: 'الوصف', rows: 8, max: TR_MAX },
+];
 
 export default function ActivityFormModal({ activity, onClose, onSaved }) {
   const isEdit = !!activity;
@@ -14,6 +25,10 @@ export default function ActivityFormModal({ activity, onClose, onSaved }) {
     location: activity?.location || '',
     description: activity?.description || '',
   });
+  const [translations, setTranslations] = useState(
+    activity?.translations && typeof activity.translations === 'object' && !Array.isArray(activity.translations) ? activity.translations : {}
+  );
+  const subActivities = Array.isArray(activity?.sub_activities) ? activity.sub_activities : [];
   const [imageFile, setImageFile] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -41,9 +56,15 @@ export default function ActivityFormModal({ activity, onClose, onSaved }) {
         description: values.description || null,
         cover_image_url: coverUrl,
       };
-      await saveActivity(activity, payload);
+      // الترجمات (0013): تُرسل فقط إن كان العمود موجودًا أصلًا (عند التعديل) أو كُتب فيها شيء
+      const cleaned = cleanTr(translations, TR_MAX);
+      if ((isEdit && 'translations' in activity) || hasTr(cleaned)) payload.translations = cleaned;
+      const result = await saveActivity(activity, payload);
       t?.remove();
       window.notify?.success('تم حفظ النشاط بنجاح');
+      if (result?.degraded) {
+        window.notify?.info('حُفظ النص العربي فقط، أما الترجمات فتحتاج تشغيل ملف SQL رقم 0013 في Supabase أولًا.');
+      }
       onSaved();
     } catch (err) {
       t?.remove();
@@ -97,6 +118,22 @@ export default function ActivityFormModal({ activity, onClose, onSaved }) {
           <label htmlFor="f_description">الوصف</label>
           <textarea id="f_description" name="description" className="admin-textarea" style={{ minHeight: 140 }} value={values.description} onChange={handleChange} />
         </div>
+        <TranslationTabs
+          translations={translations}
+          onChange={setTranslations}
+          fields={ACTIVITY_TR_FIELDS}
+          source={{ title: values.title, category: values.category, target_audience: values.target_audience, location: values.location, description: values.description.replace(/<[^>]*>/g, ' ').slice(0, 120) }}
+          list={{
+            key: 'sub_activities',
+            label: 'ترجمة المشاريع الفرعية',
+            items: subActivities,
+            itemLabel: (item, i) => `${i + 1}. ${item?.title || ''}`,
+            fields: [
+              { key: 'title', label: 'العنوان', max: 300 },
+              { key: 'desc', label: 'الوصف', rows: 2, max: 1000 },
+            ],
+          }}
+        />
         <div className="admin-modal-actions">
           <button type="submit" className="admin-btn admin-btn-primary" disabled={saving}>
             {isEdit ? 'حفظ التعديلات' : 'حفظ كمسودة'}

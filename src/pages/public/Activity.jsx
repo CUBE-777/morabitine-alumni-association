@@ -11,7 +11,7 @@ import Lightbox from '../../components/common/Lightbox';
 import { fetchActivityBySlug } from '../../services/supabase/activityDetail.service';
 import { defaultActivities } from '../../constants/defaultActivities';
 import { sanitizeRichText, safeUrl } from '../../utils/sanitize';
-import { formatDate } from '../../utils/i18nContent';
+import { formatDate, localizeActivityDetail } from '../../utils/i18nContent';
 import { useDocumentMeta } from '../../hooks/useDocumentMeta';
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}/;
@@ -46,7 +46,10 @@ export default function Activity() {
 
   useEffect(() => load(), [load]);
 
-  const { status, item } = state;
+  const { status } = state;
+  const lang = String(i18n.resolvedLanguage || i18n.language || 'ar').slice(0, 2);
+  // عرض النشاط بلغة الزائر (مع الرجوع للعربية عند غياب الترجمة)
+  const item = useMemo(() => localizeActivityDetail(state.item, lang), [state.item, lang]);
   const plainDescription = item?.content ? item.content.replace(/<[^>]*>/g, '').slice(0, 160) : undefined;
   useDocumentMeta(
     item

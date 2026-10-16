@@ -1,5 +1,6 @@
 import { supabase } from './client';
 import { logAction } from './auth.service';
+import { isMissingColumn } from './profileColumns';
 
 export const CONTENT_FIELDS = [
   { section: 'homepage', key: 'hero_title', label: 'عنوان الصفحة الرئيسية (Hero)' },
@@ -13,8 +14,17 @@ export async function fetchSiteContentAdmin() {
   return data || [];
 }
 
+// يُرجع { degraded } = true إن حُفظت النصوص العربية فقط لأن عمود translations (0013) غير موجود بعد.
 export async function saveSiteContent(rows) {
-  const { error } = await supabase.from('site_content').upsert(rows, { onConflict: 'section,key' });
+  let degraded = false;
+  let { error } = await supabase.from('site_content').upsert(rows, { onConflict: 'section,key' });
+  if (error && isMissingColumn(error) && rows.some((r) => 'translations' in r)) {
+    degraded = true;
+    ({ error } = await supabase
+      .from('site_content')
+      .upsert(rows.map(({ translations, ...rest }) => rest), { onConflict: 'section,key' }));
+  }
   if (error) throw error;
   await logAction('ADMIN_UPDATED_CONTENT', 'site_content', null, 'تحديث محتوى الموقع');
+  return { degraded };
 }

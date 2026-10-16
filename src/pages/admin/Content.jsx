@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import AdminLayout from '../../layouts/AdminLayout';
 import AdminPageHeader from '../../components/admin/AdminPageHeader';
 import StateBox from '../../components/admin/StateBox';
+import InlineTranslationInputs from '../../components/admin/InlineTranslationInputs';
+import { cleanTr, hasTr } from '../../utils/translationForm';
 import { CONTENT_FIELDS, fetchSiteContentAdmin, saveSiteContent } from '../../services/supabase/adminContent.service';
 
 // أسماء الأقسام للتبويبات (المفتاح = section في site_content)
@@ -11,6 +13,8 @@ export default function Content() {
   const [values, setValues] = useState(null); // null = يحمَّل
   const [error, setError] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [trs, setTrs] = useState({}); // ترجمات كل حقل ("section.key" → {fr:{value}, en:{value}})
+  const [trColumn, setTrColumn] = useState(false); // هل عمود translations موجود في القاعدة (0013)
   const sections = useMemo(() => [...new Set(CONTENT_FIELDS.map((f) => f.section))], []);
   const [active, setActive] = useState(sections[0]);
 
@@ -20,10 +24,14 @@ export default function Content() {
     fetchSiteContentAdmin()
       .then((data) => {
         const v = {};
+        const tr = {};
         CONTENT_FIELDS.forEach((f) => {
           const row = data.find((d) => d.section === f.section && d.key === f.key);
           v[`${f.section}.${f.key}`] = row?.value || '';
+          tr[`${f.section}.${f.key}`] = row?.translations && typeof row.translations === 'object' ? row.translations : {};
         });
+        setTrColumn(data.some((d) => 'translations' in d));
+        setTrs(tr);
         setValues(v);
       })
       .catch((err) => {
@@ -45,10 +53,20 @@ export default function Content() {
     setSaving(true);
     const t = window.notify?.loading('جاري الحفظ...');
     try {
-      const rows = CONTENT_FIELDS.map((f) => ({ section: f.section, key: f.key, value: values[`${f.section}.${f.key}`] }));
-      await saveSiteContent(rows);
+      // الترجمات (0013): تُرسل لكل الصفوف أو لا تُرسل أبدًا (صفوف الدفعة الواحدة يجب أن تتطابق أعمدتها)
+      const includeTr = trColumn || CONTENT_FIELDS.some((f) => hasTr(trs[`${f.section}.${f.key}`]));
+      const rows = CONTENT_FIELDS.map((f) => {
+        const k = `${f.section}.${f.key}`;
+        const row = { section: f.section, key: f.key, value: values[k] };
+        if (includeTr) row.translations = cleanTr(trs[k], 500);
+        return row;
+      });
+      const result = await saveSiteContent(rows);
       t?.remove();
       window.notify?.success('تم حفظ التغييرات بنجاح');
+      if (result?.degraded) {
+        window.notify?.info('حُفظت النصوص العربية فقط، أما الترجمات فتحتاج تشغيل ملف SQL رقم 0013 في Supabase أولًا.');
+      }
     } catch (err) {
       t?.remove();
       window.notify?.fromError(err, 'تعذر حفظ التغييرات');
@@ -83,6 +101,14 @@ export default function Content() {
                       rows={2}
                       value={values[`${f.section}.${f.key}`]}
                       onChange={(e) => handleChange(f, e.target.value)}
+                    />
+                    <InlineTranslationInputs
+                      id={`fld_${f.section}_${f.key}`}
+                      translations={trs[`${f.section}.${f.key}`]}
+                      onChange={(next) => setTrs((m) => ({ ...m, [`${f.section}.${f.key}`]: next }))}
+                      placeholder={values[`${f.section}.${f.key}`]}
+                      rows={2}
+                      maxLength={500}
                     />
                   </div>
                 ))}

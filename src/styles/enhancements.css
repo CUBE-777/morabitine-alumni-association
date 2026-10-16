@@ -1215,3 +1215,21 @@ section[id],
   align-self: center;
   margin-top: var(--space-1);
 }
+
+/* سنة التخرج والتخصص داخل بطاقة المكتب: في المنتصف وبنفس شكل معلومات بطاقة العضو (إضافة فقط) */
+.board-card-facts {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  text-align: center;
+}
+.board-card-facts li,
+.board-card-facts li:last-child {
+  align-items: center;
+  padding-bottom: 5px;
+  border-bottom: 1px dashed var(--border-soft);
+}
+.board-card-facts strong {
+  text-align: center;
+}

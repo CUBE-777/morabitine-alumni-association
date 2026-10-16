@@ -17,12 +17,16 @@ export async function reorderBoardMembers(orderedIds) {
   if (error) throw error;
 }
 
-// يُرجع { degraded } = true إن حُفظت البيانات الأساسية فقط لأن أعمدة الملف العام/الترجمات (0011) غير موجودة بعد.
+// يُرجع { degraded } = true إن حُفظت البيانات الأساسية فقط لأن أعمدة الملف العام/الترجمات (0011/0012) غير موجودة بعد.
+// أعمدة اختيارية خاصة بالمكتب (migration 0012): سنة التخرج والتخصص
+const BOARD_OPTIONAL_COLS = ['promotion', 'track'];
+
 export async function saveBoardMember(existing, payload) {
   if (existing) {
     const { res, degraded } = await runWithColumnFallback(
       (p) => supabase.from('board_members').update(p).eq('id', existing.id),
-      payload
+      payload,
+      BOARD_OPTIONAL_COLS
     );
     if (res.error) throw res.error;
     await logAction('ADMIN_UPDATED_BOARD_MEMBER', 'board_members', existing.id, `تعديل بيانات عضو المكتب ${payload.full_name}`);
@@ -32,7 +36,8 @@ export async function saveBoardMember(existing, payload) {
   const insertPayload = { ...payload, sort_order: count || 0 };
   const { res, degraded } = await runWithColumnFallback(
     (p) => supabase.from('board_members').insert(p).select().single(),
-    insertPayload
+    insertPayload,
+    BOARD_OPTIONAL_COLS
   );
   if (res.error) throw res.error;
   await logAction('ADMIN_CREATED_BOARD_MEMBER', 'board_members', res.data?.id || null, `إضافة عضو مكتب جديد: ${payload.full_name}`);

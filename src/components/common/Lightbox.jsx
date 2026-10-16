@@ -53,7 +53,8 @@ export default function Lightbox() {
 
   const currentImg = imagesRef.current[index];
   const caption = currentImg ? currentImg.alt || currentImg.getAttribute('data-caption') || '' : '';
-  const showCaption = caption && caption !== 'صورة المعرض';
+  // لا نعرض النص الافتراضي لوصف الصورة (بكل اللغات) كتعليق، بل التعليق الحقيقي فقط
+  const showCaption = caption && caption !== 'صورة المعرض' && caption !== t('a11y.galleryImageAlt');
 
   // قفل تمرير الصفحة أثناء المعاينة + إعادة التركيز لزر الإغلاق
   useEffect(() => {

@@ -41,8 +41,8 @@ function boardRowToPerson(row, { inMembers = false } = {}) {
     roleTr: { fr: isObj(tr.fr) ? tr.fr.position : '', en: isObj(tr.en) ? tr.en.position : '' },
     university: row.university,
     age: null,
-    promo: null,
-    track: null,
+    promo: row.promotion || null, // سنة التخرج (migration 0012)
+    track: row.track || null, // التخصص (migration 0012)
     profession: null,
     bio: row.bio, // نبذة مختصرة (إن وجدت) تُعرض تحت الاسم في بطاقة المكتب
     image: row.photo_url,
@@ -62,7 +62,10 @@ async function fetchBoardRows() {
     .select(cols)
     .eq('is_active', true)
     .order('sort_order', { ascending: true });
-  let res = await query(`${BASE}, public_bio, study_path, socials, extra, translations`);
+  // تراجع تدريجي: (0012 + 0011) ← (0011 فقط) ← الأعمدة الأساسية
+  const PROFILE = 'public_bio, study_path, socials, extra, translations';
+  let res = await query(`${BASE}, promotion, track, ${PROFILE}`);
+  if (res.error) res = await query(`${BASE}, ${PROFILE}`);
   if (res.error) res = await query(BASE);
   if (res.error) throw res.error;
   return res.data || [];
@@ -109,6 +112,8 @@ function mergeBoardIntoMembers(members, boardRows) {
     match.roleTr = board.roleTr;
     match.image = match.image || board.image;
     match.university = match.university || board.university;
+    match.promo = match.promo || board.promo;
+    match.track = match.track || board.track;
     match.publicBio = match.publicBio || board.publicBio;
     match.studyPath = match.studyPath || board.studyPath;
     if (!isObj(match.socials) || !Object.keys(match.socials).length) match.socials = board.socials;
